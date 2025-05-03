@@ -157,7 +157,7 @@ class _DashboardState extends State<Dashboard> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 28, color: Colors.grey[800]),
-          SizedBox(height: 8),
+          SizedBox(height: 10),
           Text(
             label,
             style: TextStyle(fontSize: 12, color: Colors.grey[800]),
