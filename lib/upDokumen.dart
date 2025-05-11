@@ -161,5 +161,4 @@ class _UploadDocumentsPageState extends State<UploadDocumentsPage> {
         uploadedFiles[fieldName] = result.files.single.path;
       });
     }
-  }
-}
+  }}

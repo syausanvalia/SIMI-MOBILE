@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'dashboard.dart';
+import 'custom_navbar.dart';
 import 'forgotPass.dart';
 import 'register.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: LoginPage(),
-    debugShowCheckedModeBanner: false,
-  ));
-}
-
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -48,11 +43,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handleLogin() {
-    // Langsung arahkan ke dashboard tanpa autentikasi
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Dashboard()),
-    );
+    Navigator.pushReplacementNamed(context, '/dashboard');
   }
 
   @override
@@ -234,5 +225,4 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-}
+  }}

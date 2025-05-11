@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'dashboard.dart';
+import 'infoBerangkat.dart';
+import 'trainingSchadule.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -8,13 +12,17 @@ void main() {
 }
 
 class PopularNewsPage extends StatefulWidget {
+  final int activeNavIndex;
+  
+  const PopularNewsPage({Key? key, this.activeNavIndex = 1}) : super(key: key);
+  
   @override
   _PopularNewsPageState createState() => _PopularNewsPageState();
 }
 
 class _PopularNewsPageState extends State<PopularNewsPage> {
-  int _currentIndex = 1;
-
+  late int _currentIndex;
+  
   final List<Map<String, String>> newsList = [
     {
       'image': 'assets/pasar.jpeg',
@@ -27,16 +35,22 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
       'subtitle': 'Jenazah Ayah Dibakar'
     },
     {
-      'image': 'assets/news3.jpg',
+      'image': 'assets/dibakar.jpg',
       'title': 'Berita Ketiga',
       'subtitle': 'Subjudul Ketiga'
     },
     {
-      'image': 'assets/news4.jpg',
+      'image': 'assets/pasar.jpg',
       'title': 'Berita Keempat',
       'subtitle': 'Subjudul Keempat'
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.activeNavIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +60,16 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Back Button
+
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: Icon(Icons.arrow_back, size: 28),
+                child: const Icon(Icons.arrow_back, size: 28),
               ),
             ),
 
-            // Section Title
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -68,19 +82,19 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
               ),
             ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Scrollable News Cards
             SizedBox(
               height: 190,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: newsList.map((news) {
                     return Container(
                       width: 160,
-                      margin: EdgeInsets.only(right: 16),
+                      margin: const EdgeInsets.only(right: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         color: Colors.white,
@@ -88,7 +102,7 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.15),
                             blurRadius: 5,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -96,7 +110,7 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ClipRRect(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                             child: Image.asset(
                               news['image']!,
                               height: 100,
@@ -111,12 +125,12 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
                               children: [
                                 Text(
                                   news['title']!,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Text(
                                   news['subtitle']!,
                                   style: TextStyle(
@@ -134,9 +148,128 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
                 ),
               ),
             ),
-
-            Spacer(),
+            const Spacer(),
           ],
+        ),
+      ),
+      bottomNavigationBar: _buildBottomNavBar(context),
+      extendBody: true,
+    );
+  }
+
+  Widget _buildBottomNavBar(BuildContext context) {
+    final navigationKey = GlobalKey<CurvedNavigationBarState>();
+    final items = <Widget>[
+      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      const Icon(Icons.home, size: 30, color: Colors.grey),
+      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.pink[100]!,
+            const Color.fromARGB(255, 244, 229, 186),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: CurvedNavigationBar(
+        key: navigationKey,
+        color: const Color.fromARGB(255, 255, 192, 203),
+        buttonBackgroundColor: const Color(0xFFFFF6F6),
+        backgroundColor: Colors.transparent,
+        height: 60,
+        animationCurve: Curves.easeInOut,
+        animationDuration: const Duration(milliseconds: 300),
+        index: _currentIndex,
+        items: items,
+        onTap: (index) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomNavBarPage(initialIndex: index),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class CustomNavBarPage extends StatefulWidget {
+  final int initialIndex;
+  const CustomNavBarPage({Key? key, this.initialIndex = 1}) : super(key: key);
+
+  @override
+  State<CustomNavBarPage> createState() => _CustomNavBarPageState();
+}
+
+class _CustomNavBarPageState extends State<CustomNavBarPage> {
+  final navigationKey = GlobalKey<CurvedNavigationBarState>();
+  late int _currentIndex;
+  
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
+  Widget _getPageByIndex(int index) {
+    switch(index) {
+      case 0:
+        return InfoberangkatPage();
+      case 1:
+        return Dashboard();
+      case 2:
+        return TrainingSchedulePage();
+      default:
+        return Dashboard();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <Widget>[
+      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      const Icon(Icons.home, size: 30, color: Colors.grey),
+      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+    ];
+
+    return Container(
+      color: Colors.pink[100],
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.white,
+          body: _getPageByIndex(_currentIndex),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.pink[100]!,
+                  const Color.fromARGB(255, 244, 229, 186),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: CurvedNavigationBar(
+              key: navigationKey,
+              color: const Color.fromARGB(255, 255, 192, 203),
+              buttonBackgroundColor: const Color(0xFFFFF6F6),
+              backgroundColor: Colors.transparent,
+              height: 60,
+              animationCurve: Curves.easeInOut,
+              animationDuration: const Duration(milliseconds: 300),
+              index: _currentIndex,
+              items: items,
+              onTap: (index) => setState(() => _currentIndex = index),
+            ),
+          ),
         ),
       ),
     );

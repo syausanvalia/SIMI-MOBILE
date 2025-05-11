@@ -37,7 +37,7 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header tanpa tombol back
+
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
               child: Text(
@@ -45,12 +45,11 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.pinkAccent,
+                  color: Colors.pink,
                 ),
               ),
             ),
 
-            // Form Input
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -78,7 +77,7 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFFFD6E8), // ✅ fixed color
+                            backgroundColor: Color(0xFFFFD6E8), 
                             elevation: 2,
                             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                             shape: RoundedRectangleBorder(

@@ -6,6 +6,8 @@ import 'completeData.dart';
 import 'berita.dart';
 import 'infoPekerjaan.dart';
 import 'graduation.dart';
+import 'payment.dart';
+import 'final_score.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -114,7 +116,7 @@ class _DashboardState extends State<Dashboard> {
                   _buildMenuItem(Icons.grade, "final score", () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => FinalScorePage()));
                   }),
-                  SizedBox.shrink(), // Dummy agar grid tetap 4 kolom
+                  SizedBox.shrink(),
                 ],
               ),
             ),
@@ -163,25 +165,4 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
     );
-  }
-}
-
-class PaymentPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Payment")),
-      body: Center(child: Text("This is Payment Page")),
-    );
-  }
-}
-
-class FinalScorePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Final Score")),
-      body: Center(child: Text("This is Final Score Page")),
-    );
-  }
-}
+  }}

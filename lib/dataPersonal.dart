@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dataPersonal2.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/dashboard.dart';
+import 'package:simi/infoBerangkat.dart';
+import 'package:simi/trainingSchadule.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -10,14 +14,17 @@ void main() {
 }
 
 class PersonalDataPage extends StatefulWidget {
+  final int activeNavIndex;
+  
+  const PersonalDataPage({Key? key, this.activeNavIndex = 1}) : super(key: key);
+  
   @override
   _PersonalDataPageState createState() => _PersonalDataPageState();
 }
 
 class _PersonalDataPageState extends State<PersonalDataPage> {
-  int _currentIndex = 1;
-
-
+  late int _currentIndex;
+  
   final TextEditingController idPmiController = TextEditingController();
   final TextEditingController namaLengkapController = TextEditingController();
   final TextEditingController tempatLahirController = TextEditingController();
@@ -26,12 +33,17 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
   final TextEditingController noKtpController = TextEditingController();
   final TextEditingController noPasporController = TextEditingController();
   final TextEditingController noIjazahController = TextEditingController();
-
   final TextEditingController tglPendaftaranController = TextEditingController();
   final TextEditingController tglLahirController = TextEditingController();
   final TextEditingController tglDaftarController = TextEditingController();
   final TextEditingController fullMedicalController = TextEditingController();
   final TextEditingController praMedicalController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.activeNavIndex;
+  }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
@@ -111,7 +123,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                     const SizedBox(height: 16),
                     buildTextField("Tempat Lahir", controller: tempatLahirController),
                     const SizedBox(height: 16),
-                    buildTextField("Tgl. Lahir", controller: tglLahirController),
+                    buildDateField("Tgl. Lahir", tglLahirController),
                     const SizedBox(height: 16),
                     buildTextField("NIK", controller: nikController),
                     const SizedBox(height: 16),
@@ -123,11 +135,11 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                     const SizedBox(height: 16),
                     buildTextField("No. Ijazah", controller: noIjazahController),
                     const SizedBox(height: 16),
-                    buildTextField("Tgl. Daftar", controller: tglDaftarController),
+                    buildDateField("Tgl. Daftar", tglDaftarController),
                     const SizedBox(height: 16),
-                    buildTextField("Full Medical", controller: fullMedicalController),
+                    buildDateField("Full Medical", fullMedicalController),
                     const SizedBox(height: 16),
-                    buildTextField("Pra Medical", controller: praMedicalController),
+                    buildDateField("Pra Medical", praMedicalController),
                   ],
                 ),
               ),
@@ -135,77 +147,80 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.pink[100]!, const Color.fromARGB(255, 244, 229, 186)],
-          ),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          currentIndex: _currentIndex,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.grey,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.flight_takeoff), label: "departure"),
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "home"),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: "schedule"),
-          ],
-        ),
-      ),
+      bottomNavigationBar: _buildBottomNavBar(context),
+      extendBody: true,
     );
   }
 
-  Widget buildMenuItem(IconData icon, String label) {
+  Widget _buildBottomNavBar(BuildContext context) {
+    final navigationKey = GlobalKey<CurvedNavigationBarState>();
+    final items = <Widget>[
+      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      const Icon(Icons.home, size: 30, color: Colors.grey),
+      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+    ];
+
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.pink[100]!, const Color.fromARGB(255, 244, 229, 186)]),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        gradient: LinearGradient(
+          colors: [
+            Colors.pink[100]!,
+            const Color.fromARGB(255, 244, 229, 186),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 28, color: Colors.grey[800]),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: CurvedNavigationBar(
+        key: navigationKey,
+        color: const Color.fromARGB(255, 255, 192, 203),
+        buttonBackgroundColor: const Color(0xFFFFF6F6),
+        backgroundColor: Colors.transparent,
+        height: 60,
+        animationCurve: Curves.easeInOut,
+        animationDuration: const Duration(milliseconds: 300),
+        index: _currentIndex,
+        items: items,
+        onTap: (index) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomNavBarPage(initialIndex: index),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget buildTextField(String label, {TextEditingController? controller}) {
-    final isDateField = controller != null &&
-        (label.toLowerCase().contains("tgl") || label.toLowerCase().contains("tanggal"));
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const UnderlineInputBorder(),
+      ),
+    );
+  }
 
+  Widget buildDateField(String label, TextEditingController controller) {
     return Row(
       children: [
         Expanded(
           child: TextField(
             controller: controller,
-            readOnly: isDateField,
+            readOnly: true,
             decoration: InputDecoration(
               labelText: label,
               border: const UnderlineInputBorder(),
             ),
-            onTap: isDateField ? () => _selectDate(context, controller) : null,
+            onTap: () => _selectDate(context, controller),
           ),
         ),
-        if (isDateField)
-          IconButton(
-            icon: const Icon(Icons.calendar_today_outlined, size: 20),
-            onPressed: () => _selectDate(context, controller),
-          ),
+        IconButton(
+          icon: const Icon(Icons.calendar_today_outlined, size: 20),
+          onPressed: () => _selectDate(context, controller),
+        ),
       ],
     );
   }
@@ -250,6 +265,83 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class CustomNavBarPage extends StatefulWidget {
+  final int initialIndex;
+  const CustomNavBarPage({Key? key, this.initialIndex = 1}) : super(key: key);
+
+  @override
+  State<CustomNavBarPage> createState() => _CustomNavBarPageState();
+}
+
+class _CustomNavBarPageState extends State<CustomNavBarPage> {
+  final navigationKey = GlobalKey<CurvedNavigationBarState>();
+  late int _currentIndex;
+  
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
+  Widget _getPageByIndex(int index) {
+    switch(index) {
+      case 0:
+        return InfoberangkatPage();
+      case 1:
+        return Dashboard();
+      case 2:
+        return TrainingSchedulePage();
+      default:
+        return Dashboard();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <Widget>[
+      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      const Icon(Icons.home, size: 30, color: Colors.grey),
+      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+    ];
+
+    return Container(
+      color: Colors.pink[100],
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.white,
+          body: _getPageByIndex(_currentIndex),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.pink[100]!,
+                  const Color.fromARGB(255, 244, 229, 186),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: CurvedNavigationBar(
+              key: navigationKey,
+              color: const Color.fromARGB(255, 255, 192, 203),
+              buttonBackgroundColor: const Color(0xFFFFF6F6),
+              backgroundColor: Colors.transparent,
+              height: 60,
+              animationCurve: Curves.easeInOut,
+              animationDuration: const Duration(milliseconds: 300),
+              index: _currentIndex,
+              items: items,
+              onTap: (index) => setState(() => _currentIndex = index),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

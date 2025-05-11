@@ -168,5 +168,4 @@ class _PersonalData2PageState extends State<PersonalData2Page> {
         ),
       ],
     );
-  }
-}
+  }}
