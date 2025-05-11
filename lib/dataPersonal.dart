@@ -17,7 +17,7 @@ class PersonalDataPage extends StatefulWidget {
 class _PersonalDataPageState extends State<PersonalDataPage> {
   int _currentIndex = 1;
 
-  // Controller untuk setiap TextField
+
   final TextEditingController idPmiController = TextEditingController();
   final TextEditingController namaLengkapController = TextEditingController();
   final TextEditingController tempatLahirController = TextEditingController();

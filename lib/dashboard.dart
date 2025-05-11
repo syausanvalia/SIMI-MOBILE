@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:simi/graduation.dart';
+import 'package:simi/trainingSchadule.dart';
+import 'dataPersonal.dart';
+import 'completeData.dart';
+import 'berita.dart';
+import 'infoPekerjaan.dart';
+import 'graduation.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -13,12 +20,6 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  int _currentIndex = 1;
-
-  TextEditingController controllerNama = TextEditingController();
-  TextEditingController controllerPass = TextEditingController();
-  TextEditingController controllerMoto = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +42,7 @@ class _DashboardState extends State<Dashboard> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 image: DecorationImage(
-                  image: AssetImage('assets/google.png'),
+                  image: AssetImage('assets/fotodashboard.png'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -87,58 +88,35 @@ class _DashboardState extends State<Dashboard> {
             Expanded(
               child: GridView.count(
                 crossAxisCount: 4,
-                shrinkWrap: true,
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
                 childAspectRatio: 1,
                 children: [
-                  _buildMenuItem(Icons.article, "complete data"),
-                  _buildMenuItem(Icons.school, "graduation"),
-                  _buildMenuItem(Icons.work, "job information"),
-                  _buildMenuItem(Icons.person, "personal data"),
-                  _buildMenuItem('assets/payment.png', "payment"), // menggunakan gambar
-                  _buildMenuItem(Icons.school, "training subject"),
-                  _buildMenuItem(Icons.work, "popular news"),
-                  _buildMenuItem(Icons.person, "final score"),
+                  _buildMenuItem(Icons.assignment_turned_in, "complete data", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => CompleteDataPage()));
+                  }),
+                  _buildMenuItem(Icons.school, "graduation", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => Graduation()));
+                  }),
+                  _buildMenuItem(Icons.work_outline, "job information", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => JobInfoPage()));
+                  }),
+                  _buildMenuItem(Icons.account_box, "personal data", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => PersonalDataPage()));
+                  }),
+                  _buildMenuItem('assets/payment.png', "payment", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentPage()));
+                  }),
+                  _buildMenuItem(Icons.newspaper, "popular news", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => PopularNewsPage()));
+                  }),
+                  _buildMenuItem(Icons.grade, "final score", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => FinalScorePage()));
+                  }),
+                  SizedBox.shrink(), // Dummy agar grid tetap 4 kolom
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.pink[100]!,
-              Color.fromARGB(255, 244, 229, 186),
-            ],
-          ),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          currentIndex: _currentIndex,
-          selectedItemColor: const Color.fromARGB(255, 255, 255, 255),
-          unselectedItemColor: Colors.grey,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.flight_takeoff),
-              label: "departure",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "home",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: "schedule",
             ),
           ],
         ),
@@ -146,7 +124,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildMenuItem(dynamic icon, String label) {
+  Widget _buildMenuItem(dynamic icon, String label, VoidCallback onTap) {
     Widget iconWidget;
 
     if (icon is IconData) {
@@ -158,29 +136,52 @@ class _DashboardState extends State<Dashboard> {
         height: 28,
       );
     } else {
-      iconWidget = Icon(Icons.help_outline, size: 28); 
+      iconWidget = Icon(Icons.help_outline, size: 28);
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.pink[100]!, Color.fromARGB(255, 244, 229, 186)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          iconWidget,
-          SizedBox(height: 10),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
-            textAlign: TextAlign.center,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.pink[100]!, Color.fromARGB(255, 244, 229, 186)],
           ),
-        ],
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            iconWidget,
+            SizedBox(height: 10),
+            Text(
+              label,
+              style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class PaymentPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Payment")),
+      body: Center(child: Text("This is Payment Page")),
+    );
+  }
+}
+
+class FinalScorePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Final Score")),
+      body: Center(child: Text("This is Final Score Page")),
     );
   }
 }

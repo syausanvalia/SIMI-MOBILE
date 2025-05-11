@@ -110,42 +110,6 @@ class _PersonalData2PageState extends State<PersonalData2Page> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.pink[100]!,
-            Color.fromARGB(255, 244, 229, 186),
-          ],
-        ),
-      ),
-  child: BottomNavigationBar(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    currentIndex: _currentIndex,
-    selectedItemColor: const Color.fromARGB(255, 255, 255, 255), 
-    unselectedItemColor: Colors.grey, 
-    onTap: (index) {
-      setState(() {
-        _currentIndex = index;
-      });
-    },
-    items: const [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.flight_takeoff),
-        label: "departure",
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home),
-        label: "home",
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.calendar_today),
-        label: "schedule",
-      ),
-    ],
-      ),
-      ),
     );
   }
 
