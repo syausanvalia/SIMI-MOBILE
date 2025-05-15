@@ -35,14 +35,14 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
       'subtitle': 'Jenazah Ayah Dibakar'
     },
     {
-      'image': 'assets/dibakar.jpg',
-      'title': 'Berita Ketiga',
-      'subtitle': 'Subjudul Ketiga'
+      'image': 'assets/jalaniSumpah.jpeg',
+      'title': 'Jay Idzes',
+      'subtitle': 'Rampung jalani pengambilan sumpah'
     },
     {
-      'image': 'assets/pasar.jpg',
-      'title': 'Berita Keempat',
-      'subtitle': 'Subjudul Keempat'
+      'image': 'assets/fotodashboard.jpg',
+      'title': 'Berita Promo',
+      'subtitle': 'Promo Sale'
     },
   ];
 
@@ -84,7 +84,6 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
 
             const SizedBox(height: 16),
 
-            // Scrollable News Cards
             SizedBox(
               height: 190,
               child: SingleChildScrollView(

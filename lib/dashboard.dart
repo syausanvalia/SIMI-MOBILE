@@ -99,7 +99,7 @@ class _DashboardState extends State<Dashboard> {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => CompleteDataPage()));
                   }),
                   _buildMenuItem(Icons.school, "graduation", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => Graduation()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => GraduationPage()));
                   }),
                   _buildMenuItem(Icons.work_outline, "job information", () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => JobInfoPage()));

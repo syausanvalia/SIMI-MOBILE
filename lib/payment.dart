@@ -1,98 +1,215 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/konfirmasiPayment.dart';
 import 'dashboard.dart';
 import 'infoBerangkat.dart';
 import 'trainingSchadule.dart';
 
 void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: PaymentPage(),
-  ));
+  runApp(const MyApp());
 }
 
-class PaymentPage extends StatefulWidget {
-  final int activeNavIndex;
-  
-  const PaymentPage({Key? key, this.activeNavIndex = 1}) : super(key: key);
-  
-  @override
-  _PaymentPageState createState() => _PaymentPageState();
-}
-
-class _PaymentPageState extends State<PaymentPage> {
-  late int _currentIndex;
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.activeNavIndex;
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: CustomNavBarPage(initialIndex: 1),
+    );
   }
+}
+
+class PaymentPage extends StatelessWidget {
+  const PaymentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Payment',
-          style: TextStyle(color: Colors.black),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Payment Now!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.pink[300], 
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'PAKET PELATIHAN',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        const PaymentDetailRow(title: 'ID Pelatihan', value: 'E43252'),
+                        const PaymentDetailRow(title: 'Paket Pelatihan', value: 'Paket A'),
+                        const PaymentDetailRow(title: 'Total Pembayaran', value: 'Rp. 15.000.000'),
+
+                        const Divider(height: 30, thickness: 1),
+
+                        const PaymentBankItem(
+                          imagePath: 'assets/bni.png',
+                          name: 'Valiaa Cecann',
+                          accountNumber: '089515771237',
+                        ),
+                        const PaymentBankItem(
+                          imagePath: 'assets/mandiri.png',
+                          name: 'Lyaa',
+                          accountNumber: '089515772377',
+                        ),
+                        const PaymentBankItem(
+                          imagePath: 'assets/bri.png',
+                          name: 'Syausan',
+                          accountNumber: '089515783937',
+                        ),
+
+                        const SizedBox(height: 24),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.pink[50],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            'Pembayaran harus dilakukan paling lambat 1 hari sebelum pelatihan. '
+                            'Setelah pembayaran, harap lakukan konfirmasi dengan memasukkan nomor resi transfer. Terima kasih :)',
+                            style: TextStyle(fontSize: 13),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                            Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => konfirmasiPayment()),
+                          );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                              backgroundColor: Colors.pink[100]!,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 4,
+                            ),
+                            child: const Text(
+                              'NEXT',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      body: Center(
-        child: Text(
-          'Payment Content Here',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavBar(context),
-      extendBody: true,
     );
   }
+}
 
-  Widget _buildBottomNavBar(BuildContext context) {
-    final navigationKey = GlobalKey<CurvedNavigationBarState>();
-    final items = <Widget>[
-      Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      Icon(Icons.home, size: 30, color: Colors.grey),
-      Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
+class PaymentDetailRow extends StatelessWidget {
+  final String title;
+  final String value;
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.pink[100]!,
-            Color.fromARGB(255, 244, 229, 186),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+  const PaymentDetailRow({
+    Key? key,
+    required this.title,
+    required this.value,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: const TextStyle(color: Colors.grey)),
+          Text(": $value", style: const TextStyle(fontWeight: FontWeight.w500)),
+        ],
       ),
-      child: CurvedNavigationBar(
-        key: navigationKey,
-        color: Color.fromARGB(255, 255, 192, 203),
-        buttonBackgroundColor: Color(0xFFFFF6F6),
-        backgroundColor: Colors.transparent,
-        height: 60,
-        animationCurve: Curves.easeInOut,
-        animationDuration: Duration(milliseconds: 300),
-        index: _currentIndex,
-        items: items,
-        onTap: (index) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CustomNavBarPage(initialIndex: index),
-            ),
-          );
-        },
+    );
+  }
+}
+
+class PaymentBankItem extends StatelessWidget {
+  final String imagePath;
+  final String name;
+  final String accountNumber;
+
+  const PaymentBankItem({
+    Key? key,
+    required this.imagePath,
+    required this.name,
+    required this.accountNumber,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Image.asset(imagePath, width: 50),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Nama   : $name"),
+              Text("No.Rek : $accountNumber"),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -109,7 +226,7 @@ class CustomNavBarPage extends StatefulWidget {
 class _CustomNavBarPageState extends State<CustomNavBarPage> {
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
   late int _currentIndex;
-  
+
   @override
   void initState() {
     super.initState();
@@ -117,24 +234,24 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   }
 
   Widget _getPageByIndex(int index) {
-    switch(index) {
+    switch (index) {
       case 0:
         return InfoberangkatPage();
       case 1:
-        return Dashboard();
+        return const PaymentPage();
       case 2:
         return TrainingSchedulePage();
       default:
-        return Dashboard();
+        return const PaymentPage();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      Icon(Icons.home, size: 30, color: Colors.grey),
-      Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      const Icon(Icons.home, size: 30, color: Colors.grey),
+      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
     ];
 
     return Container(
@@ -150,7 +267,7 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
               gradient: LinearGradient(
                 colors: [
                   Colors.pink[100]!,
-                  Color.fromARGB(255, 244, 229, 186),
+                  const Color.fromARGB(255, 244, 229, 186),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -158,12 +275,12 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
             ),
             child: CurvedNavigationBar(
               key: navigationKey,
-              color: Color.fromARGB(255, 255, 192, 203),
-              buttonBackgroundColor: Color(0xFFFFF6F6),
+              color: const Color.fromARGB(255, 255, 192, 203),
+              buttonBackgroundColor: const Color(0xFFFFF6F6),
               backgroundColor: Colors.transparent,
               height: 60,
               animationCurve: Curves.easeInOut,
-              animationDuration: Duration(milliseconds: 300),
+              animationDuration: const Duration(milliseconds: 300),
               index: _currentIndex,
               items: items,
               onTap: (index) => setState(() => _currentIndex = index),

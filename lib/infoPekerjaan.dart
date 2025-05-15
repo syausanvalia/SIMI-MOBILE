@@ -83,7 +83,7 @@ class _JobInfoPageState extends State<JobInfoPage> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
+                      color: Colors.grey,
                       blurRadius: 6,
                       offset: Offset(0, 3),
                     ),

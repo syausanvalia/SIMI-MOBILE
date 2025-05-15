@@ -1,175 +1,160 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'dashboard.dart';
-import 'infoBerangkat.dart';
-import 'trainingSchadule.dart';
 
 void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
+  runApp(const MaterialApp(
     home: FinalScorePage(),
-  ));
+    debugShowCheckedModeBanner: false,
+ ));
 }
 
 class FinalScorePage extends StatefulWidget {
-  final int activeNavIndex;
-  
-  const FinalScorePage({Key? key, this.activeNavIndex = 1}) : super(key: key);
-  
+  const FinalScorePage({super.key});
+
   @override
-  _FinalScorePageState createState() => _FinalScorePageState();
+  State<FinalScorePage> createState() => _FinalScorePageState();
 }
 
 class _FinalScorePageState extends State<FinalScorePage> {
-  late int _currentIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.activeNavIndex;
-  }
+  int _currentIndex = 1;
+  List<Map<String, String>> trainingScheduleList = [
+    {
+      'ID': '1',
+      'Nama Materi': '',
+      'KKM': '',
+      'Nilai': '',
+      'Status': '',
+    },
+    {
+      'ID': '1',
+      'Nama Materi': '',
+      'KKM': '',
+      'Nilai': '',
+      'Status': '',
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Final Score',
-          style: TextStyle(color: Colors.black),
+      body: SafeArea(
+        child: Column(
+          children: [
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Final Result",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.pinkAccent,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                    dataRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                    border: TableBorder.all(color: Colors.black, width: 0.5),
+                    columns: const [
+                      DataColumn(label: Text('ID')),
+                      DataColumn(label: Text('Nama')),
+                      DataColumn(label: Text('KKM')),
+                      DataColumn(label: Text('Nilai')),
+                      DataColumn(label: Text('Status')),
+                    ],
+                    rows: trainingScheduleList.map((data) {
+                      return DataRow(cells: [
+                        DataCell(Text(data['ID'] ?? 'N/A')), 
+                        DataCell(Text(data['Nama'] ?? 'N/A')), 
+                        DataCell(Text(data['KKM'] ?? 'N/A')), 
+                        DataCell(Text(data['Nilai'] ?? 'N/A')), 
+                        DataCell(Text(data['Status'] ?? 'N/A')), 
+                      ]);
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      body: Center(
-        child: Text(
-          'Final Score Content Here',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavBar(context),
-      extendBody: true,
-    );
-  }
 
-  Widget _buildBottomNavBar(BuildContext context) {
-    final navigationKey = GlobalKey<CurvedNavigationBarState>();
-    final items = <Widget>[
-      Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      Icon(Icons.home, size: 30, color: Colors.grey),
-      Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
-
-    return Container(
+      bottomNavigationBar: Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
             Colors.pink[100]!,
             Color.fromARGB(255, 244, 229, 186),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+         ],
         ),
       ),
-      child: CurvedNavigationBar(
-        key: navigationKey,
-        color: Color.fromARGB(255, 255, 192, 203),
-        buttonBackgroundColor: Color(0xFFFFF6F6),
-        backgroundColor: Colors.transparent,
-        height: 60,
-        animationCurve: Curves.easeInOut,
-        animationDuration: Duration(milliseconds: 300),
-        index: _currentIndex,
-        items: items,
-        onTap: (index) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CustomNavBarPage(initialIndex: index),
-            ),
-          );
-        },
+  child: BottomNavigationBar(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    currentIndex: _currentIndex,
+    selectedItemColor: const Color.fromARGB(255, 255, 255, 255), 
+    unselectedItemColor: Colors.grey, 
+    onTap: (index) {
+      setState(() {
+        _currentIndex = index;
+      });
+    },
+    items: const [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.flight_takeoff),
+        label: "departure",
       ),
-    );
-  }
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home),
+        label: "home",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.calendar_today),
+        label: "schedule",
+      ),
+    ],
+  ),
+),
+);
 }
 
-class CustomNavBarPage extends StatefulWidget {
-  final int initialIndex;
-  const CustomNavBarPage({Key? key, this.initialIndex = 1}) : super(key: key);
-
-  @override
-  State<CustomNavBarPage> createState() => _CustomNavBarPageState();
-}
-
-class _CustomNavBarPageState extends State<CustomNavBarPage> {
-  final navigationKey = GlobalKey<CurvedNavigationBarState>();
-  late int _currentIndex;
-  
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-  }
-
-  Widget _getPageByIndex(int index) {
-    switch(index) {
-      case 0:
-        return InfoberangkatPage();
-      case 1:
-        return Dashboard();
-      case 2:
-        return TrainingSchedulePage();
-      default:
-        return Dashboard();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final items = <Widget>[
-      Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      Icon(Icons.home, size: 30, color: Colors.grey),
-      Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
-
+  Widget buildMenuItem(IconData icon, String label) {
     return Container(
-      color: Colors.pink[100],
-      child: SafeArea(
-        top: false,
-        child: Scaffold(
-          extendBody: true,
-          backgroundColor: Colors.white,
-          body: _getPageByIndex(_currentIndex),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.pink[100]!,
-                  Color.fromARGB(255, 244, 229, 186),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: CurvedNavigationBar(
-              key: navigationKey,
-              color: Color.fromARGB(255, 255, 192, 203),
-              buttonBackgroundColor: Color(0xFFFFF6F6),
-              backgroundColor: Colors.transparent,
-              height: 60,
-              animationCurve: Curves.easeInOut,
-              animationDuration: Duration(milliseconds: 300),
-              index: _currentIndex,
-              items: items,
-              onTap: (index) => setState(() => _currentIndex = index),
-            ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [Colors.pink[100]!, Color.fromARGB(255, 244, 229, 186)]),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 28, color: Colors.grey[800]),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+            textAlign: TextAlign.center,
           ),
-        ),
+        ],
       ),
     );
   }

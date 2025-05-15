@@ -1,51 +1,37 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
+    home: GraduationPage(),
     debugShowCheckedModeBanner: false,
-    home: Graduation(),
   ));
 }
 
-class Graduation extends StatefulWidget {
+class GraduationPage extends StatefulWidget {
+  const GraduationPage({super.key});
+
   @override
-  _GraduationPageState createState() => _GraduationPageState();
+  State<GraduationPage> createState() => _GraduationPageState();
 }
 
-class _GraduationPageState extends State<Graduation> {
-  final Map<String, TextEditingController> controllers = {
-    'ID PMI': TextEditingController(),
-    'Tgl. Pendaftaran': TextEditingController(),
-    'Nama Lengkap': TextEditingController(),
-    'Tempat Lahir': TextEditingController(),
-    'Tgl. Lahir': TextEditingController(),
-    'NIK': TextEditingController(),
-    'No. KK': TextEditingController(),
-    'No. Paspor': TextEditingController(),
-    'No. KTP': TextEditingController(),
-    'No. Ijazah': TextEditingController(),
-    'Full Medical': TextEditingController(),
-    'Pra Medical': TextEditingController(),
-    'Jabatan': TextEditingController(),
-    'Visa': TextEditingController(),
-    'Status Pernikahan': TextEditingController(),
-    'Sponsor': TextEditingController(),
-    'Tgl. Pendaftaran ID': TextEditingController(),
-    'Tgl. Keberangkatan': TextEditingController(),
-    'Tgl. Kepulangan': TextEditingController(),
-    'Pass Foto': TextEditingController(),
-    'Foto Visa': TextEditingController(),
-    'Foto KTP': TextEditingController(),
-    'Foto Akta Kelahiran': TextEditingController(),
-    'Foto KK': TextEditingController(),
-    'SKCK': TextEditingController(),
-    'Foto PP': TextEditingController(),
-    'Foto Surat Izin': TextEditingController(),
-    'Foto Ijazah': TextEditingController(),
-  };
-
-  String selectedOption = 'ex';
+class _GraduationPageState extends State<GraduationPage> {
   int _currentIndex = 1;
+  List<Map<String, String>> trainingScheduleList = [
+    {
+      'ID': '1',
+      'Nama': '',
+      'KKM': '',
+      'Nilai': '',
+      'Status': '',
+    },
+    {
+      'ID': '1',
+      'Nama': '',
+      'KKM': '',
+      'Nilai': '',
+      'Status': '',
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -54,54 +40,122 @@ class _GraduationPageState extends State<Graduation> {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Your Personal Data',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
             ),
+            const SizedBox(height: 8),
+            const Text(
+              "Graduation",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.pinkAccent,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                children: [
-                  for (var field in controllers.entries)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: TextField(
-                        controller: field.value,
-                        decoration: InputDecoration(
-                          labelText: field.key,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 8),
-                  const Text("Status:"),
-                  Row(
-                    children: ['ex', 'non'].map((option) {
-                      return Expanded(
-                        child: RadioListTile<String>(
-                          title: Text(option),
-                          value: option,
-                          groupValue: selectedOption,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedOption = value!;
-                            });
-                          },
-                        ),
-                      );
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    headingRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                    dataRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                    border: TableBorder.all(color: Colors.black, width: 0.5),
+                    columns: const [
+                      DataColumn(label: Text('ID')),
+                      DataColumn(label: Text('Nama')),
+                      DataColumn(label: Text('KKM')),
+                      DataColumn(label: Text('Nilai')),
+                      DataColumn(label: Text('Status')),
+                    ],
+                    rows: trainingScheduleList.map((data) {
+                      return DataRow(cells: [
+                        DataCell(Text(data['ID'] ?? 'N/A')), 
+                        DataCell(Text(data['Nama'] ?? 'N/A')), 
+                        DataCell(Text(data['KKM'] ?? 'N/A')), 
+                        DataCell(Text(data['Nilai'] ?? 'N/A')), 
+                        DataCell(Text(data['Status'] ?? 'N/A')), 
+                      ]);
                     }).toList(),
                   ),
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
           ],
         ),
+      ),
+
+      bottomNavigationBar: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.pink[100]!,
+            Color.fromARGB(255, 244, 229, 186),
+          ],
+        ),
+      ),
+  child: BottomNavigationBar(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    currentIndex: _currentIndex,
+    selectedItemColor: const Color.fromARGB(255, 255, 255, 255), 
+    unselectedItemColor: Colors.grey, 
+    onTap: (index) {
+      setState(() {
+        _currentIndex = index;
+      });
+    },
+    items: const [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.flight_takeoff),
+        label: "departure",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home),
+        label: "home",
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.calendar_today),
+        label: "schedule",
+      ),
+    ],
+  ),
+),
+);
+}
+
+  Widget buildMenuItem(IconData icon, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [Colors.pink[100]!, Color.fromARGB(255, 244, 229, 186)]),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 28, color: Colors.grey[800]),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

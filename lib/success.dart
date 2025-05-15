@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'login.dart';
 void main() {
   runApp(MaterialApp(
     home: SuccessPage(),
@@ -71,7 +71,10 @@ class SuccessPage extends StatelessWidget {
                 SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () {
-                   
+                   Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
