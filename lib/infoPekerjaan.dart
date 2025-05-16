@@ -148,3 +148,80 @@ class _JobInfoPageState extends State<JobInfoPage> {
   }
 }
 
+class CustomNavBarPage extends StatefulWidget {
+  final int initialIndex;
+  const CustomNavBarPage({Key? key, this.initialIndex = 1}) : super(key: key);
+
+  @override
+  State<CustomNavBarPage> createState() => _CustomNavBarPageState();
+}
+
+class _CustomNavBarPageState extends State<CustomNavBarPage> {
+  final navigationKey = GlobalKey<CurvedNavigationBarState>();
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
+  Widget _getPageByIndex(int index) {
+    switch (index) {
+      case 0:
+        return InfoberangkatPage();
+      case 1:
+        return Dashboard();
+      case 2:
+        return TrainingSchedulePage();
+      default:
+        return Dashboard();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <Widget>[
+      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      const Icon(Icons.home, size: 30, color: Colors.grey),
+      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+    ];
+
+    return Container(
+      color: Colors.pink[100],
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.white,
+          body: _getPageByIndex(_currentIndex),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.pink.shade100,
+                  const Color.fromARGB(255, 255, 243, 214),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: CurvedNavigationBar(
+              key: navigationKey,
+              color: Colors.transparent,
+              buttonBackgroundColor: Colors.white,
+              backgroundColor: Colors.transparent,
+              height: 60,
+              animationCurve: Curves.easeInOut,
+              animationDuration: const Duration(milliseconds: 300),
+              index: _currentIndex,
+              items: items,
+              onTap: (index) => setState(() => _currentIndex = index),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

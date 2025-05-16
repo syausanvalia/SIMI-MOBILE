@@ -17,7 +17,7 @@ class PersonalData2Page extends StatefulWidget {
 
 class _PersonalData2PageState extends State<PersonalData2Page> {
   String? selectedStatus;
-  int _currentIndex = 1;
+  int currentIndex = 1;
 
   final List<String> statusOptions = ['Belum Menikah', 'Menikah'];
 

@@ -168,7 +168,7 @@ Widget _buildBottomNavBar(BuildContext context) {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => CustomNavBarPage(initialIndex: index),
+              builder: (context) => CustomNavBarPage(),
             ),
           );
         },
@@ -176,8 +176,7 @@ Widget _buildBottomNavBar(BuildContext context) {
     );
   }
 }class CustomNavBarPage extends StatefulWidget {
-  final int initialIndex;
-  const CustomNavBarPage({Key? key, this.initialIndex = 1}) : super(key: key);
+  const CustomNavBarPage({super.key});
 
   @override
   State<CustomNavBarPage> createState() => _CustomNavBarPageState();
@@ -185,33 +184,20 @@ Widget _buildBottomNavBar(BuildContext context) {
 
 class _CustomNavBarPageState extends State<CustomNavBarPage> {
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
-  late int _currentIndex;
+  int _currentIndex = 1;
+
+  final pages = [
+    InfoberangkatPage(),
+    Dashboard(),
+    TrainingSchedulePage(),
+  ];
 
   @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-  }
-
-Widget _getPageByIndex(int index) {
-    switch (index) {
-      case 0:
-        return InfoberangkatPage();
-      case 1:
-        return Dashboard();
-      case 2:
-        return TrainingSchedulePage();
-      default:
-        return Dashboard();
-    }
-  }
-
-@override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      Icon(Icons.home, size: 30, color: Colors.grey),
+      Icon(Icons.calendar_today, size: 30, color: Colors.grey),
     ];
 
     return Container(
@@ -221,13 +207,13 @@ Widget _getPageByIndex(int index) {
         child: Scaffold(
           extendBody: true,
           backgroundColor: Colors.white,
-          body: _getPageByIndex(_currentIndex),
+          body: pages[_currentIndex],
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.pink[100]!,
-                  const Color.fromARGB(255, 244, 229, 186),
+                  Colors.pink.shade100,
+                  const Color.fromARGB(255, 255, 243, 214),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -235,8 +221,8 @@ Widget _getPageByIndex(int index) {
             ),
             child: CurvedNavigationBar(
               key: navigationKey,
-              color: const Color.fromARGB(255, 255, 192, 203),
-              buttonBackgroundColor: const Color(0xFFFFF6F6),
+              color: Colors.transparent, 
+              buttonBackgroundColor: Colors.white, 
               backgroundColor: Colors.transparent,
               height: 60,
               animationCurve: Curves.easeInOut,
@@ -249,4 +235,5 @@ Widget _getPageByIndex(int index) {
         ),
       ),
     );
-  }}
+  }
+}

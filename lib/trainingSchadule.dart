@@ -108,54 +108,6 @@ class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
           ],
         ),
       ),
-  child: BottomNavigationBar(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    currentIndex: _currentIndex,
-    selectedItemColor: const Color.fromARGB(255, 255, 255, 255), 
-    unselectedItemColor: Colors.grey, 
-    onTap: (index) {
-      setState(() {
-        _currentIndex = index;
-      });
-    },
-    items: const [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.flight_takeoff),
-        label: "departure",
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home),
-        label: "home",
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.calendar_today),
-        label: "schedule",
-      ),
-    ],
-  ),
-),
-);
-}
-
-  Widget buildMenuItem(IconData icon, String label) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.pink[100]!, Color.fromARGB(255, 244, 229, 186)]),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 28, color: Colors.grey[800]),
-          SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

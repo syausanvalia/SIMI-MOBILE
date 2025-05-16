@@ -11,19 +11,8 @@ void main() {
   ));
 }
 
-class PopularNewsPage extends StatefulWidget {
-  final int activeNavIndex;
-  
-  const PopularNewsPage({Key? key, this.activeNavIndex = 1}) : super(key: key);
-  
-  @override
-  _PopularNewsPageState createState() => _PopularNewsPageState();
-}
-
-class _PopularNewsPageState extends State<PopularNewsPage> {
-  late int _currentIndex;
-  
-  final List<Map<String, String>> newsList = [
+class PopularNewsPage extends StatelessWidget {
+  final List<Map<String, String>> newsList = const [
     {
       'image': 'assets/pasar.jpeg',
       'title': 'Wisata kuliner',
@@ -47,12 +36,6 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.activeNavIndex;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -60,16 +43,18 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => CustomNavBarPage()),
+                  );
+                },
                 child: const Icon(Icons.arrow_back, size: 28),
               ),
             ),
-
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -81,9 +66,7 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
             SizedBox(
               height: 190,
               child: SingleChildScrollView(
@@ -151,49 +134,6 @@ class _PopularNewsPageState extends State<PopularNewsPage> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(context),
-      extendBody: true,
-    );
-  }
-
-  Widget _buildBottomNavBar(BuildContext context) {
-    final navigationKey = GlobalKey<CurvedNavigationBarState>();
-    final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.pink[100]!,
-            const Color.fromARGB(255, 244, 229, 186),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: CurvedNavigationBar(
-        key: navigationKey,
-        color: const Color.fromARGB(255, 255, 192, 203),
-        buttonBackgroundColor: const Color(0xFFFFF6F6),
-        backgroundColor: Colors.transparent,
-        height: 60,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 300),
-        index: _currentIndex,
-        items: items,
-        onTap: (index) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CustomNavBarPage(initialIndex: index),
-            ),
-          );
-        },
-      ),
     );
   }
 }
@@ -209,7 +149,7 @@ class CustomNavBarPage extends StatefulWidget {
 class _CustomNavBarPageState extends State<CustomNavBarPage> {
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
   late int _currentIndex;
-  
+
   @override
   void initState() {
     super.initState();
@@ -217,7 +157,7 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   }
 
   Widget _getPageByIndex(int index) {
-    switch(index) {
+    switch (index) {
       case 0:
         return InfoberangkatPage();
       case 1:
@@ -249,8 +189,8 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.pink[100]!,
-                  const Color.fromARGB(255, 244, 229, 186),
+                  Colors.pink.shade100,
+                  const Color.fromARGB(255, 255, 243, 214),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -258,8 +198,8 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
             ),
             child: CurvedNavigationBar(
               key: navigationKey,
-              color: const Color.fromARGB(255, 255, 192, 203),
-              buttonBackgroundColor: const Color(0xFFFFF6F6),
+              color: Colors.transparent,
+              buttonBackgroundColor: Colors.white,
               backgroundColor: Colors.transparent,
               height: 60,
               animationCurve: Curves.easeInOut,

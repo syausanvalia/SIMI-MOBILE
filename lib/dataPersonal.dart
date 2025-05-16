@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dataPersonal2.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:simi/dashboard.dart';
 import 'package:simi/infoBerangkat.dart';
 import 'package:simi/trainingSchadule.dart';
@@ -23,7 +22,7 @@ class PersonalDataPage extends StatefulWidget {
 }
 
 class _PersonalDataPageState extends State<PersonalDataPage> {
-  late int _currentIndex;
+  late int currentIndex;
   
   final TextEditingController idPmiController = TextEditingController();
   final TextEditingController namaLengkapController = TextEditingController();
@@ -42,7 +41,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.activeNavIndex;
+    currentIndex = widget.activeNavIndex;
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
@@ -147,53 +146,11 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(context),
-      extendBody: true,
+    extendBody: true,
     );
   }
 
-  Widget _buildBottomNavBar(BuildContext context) {
-    final navigationKey = GlobalKey<CurvedNavigationBarState>();
-    final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.pink[100]!,
-            const Color.fromARGB(255, 244, 229, 186),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: CurvedNavigationBar(
-        key: navigationKey,
-        color: const Color.fromARGB(255, 255, 192, 203),
-        buttonBackgroundColor: const Color(0xFFFFF6F6),
-        backgroundColor: Colors.transparent,
-        height: 60,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 300),
-        index: _currentIndex,
-        items: items,
-        onTap: (index) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CustomNavBarPage(initialIndex: index),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget buildTextField(String label, {TextEditingController? controller}) {
+ Widget buildTextField(String label, {TextEditingController? controller}) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -266,82 +223,4 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
         ),
       ],
     );
-  }
-}
-
-class CustomNavBarPage extends StatefulWidget {
-  final int initialIndex;
-  const CustomNavBarPage({Key? key, this.initialIndex = 1}) : super(key: key);
-
-  @override
-  State<CustomNavBarPage> createState() => _CustomNavBarPageState();
-}
-
-class _CustomNavBarPageState extends State<CustomNavBarPage> {
-  final navigationKey = GlobalKey<CurvedNavigationBarState>();
-  late int _currentIndex;
-  
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-  }
-
-  Widget _getPageByIndex(int index) {
-    switch(index) {
-      case 0:
-        return InfoberangkatPage();
-      case 1:
-        return Dashboard();
-      case 2:
-        return TrainingSchedulePage();
-      default:
-        return Dashboard();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
-
-    return Container(
-      color: Colors.pink[100],
-      child: SafeArea(
-        top: false,
-        child: Scaffold(
-          extendBody: true,
-          backgroundColor: Colors.white,
-          body: _getPageByIndex(_currentIndex),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.pink[100]!,
-                  const Color.fromARGB(255, 244, 229, 186),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: CurvedNavigationBar(
-              key: navigationKey,
-              color: const Color.fromARGB(255, 255, 192, 203),
-              buttonBackgroundColor: const Color(0xFFFFF6F6),
-              backgroundColor: Colors.transparent,
-              height: 60,
-              animationCurve: Curves.easeInOut,
-              animationDuration: const Duration(milliseconds: 300),
-              index: _currentIndex,
-              items: items,
-              onTap: (index) => setState(() => _currentIndex = index),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+  }}

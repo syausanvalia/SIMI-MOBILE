@@ -13,7 +13,7 @@ class CustomNavBarPage extends StatefulWidget {
 
 class _CustomNavBarPageState extends State<CustomNavBarPage> {
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
-  int _currentIndex = 1;  
+  int _currentIndex = 1;
 
   final pages = [
     InfoberangkatPage(),
@@ -41,8 +41,8 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.pink[100]!,
-                  const Color.fromARGB(255, 244, 229, 186),
+                  Colors.pink.shade100,
+                  const Color.fromARGB(255, 255, 243, 214),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -50,8 +50,8 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
             ),
             child: CurvedNavigationBar(
               key: navigationKey,
-              color: const Color.fromARGB(255, 255, 192, 203), 
-              buttonBackgroundColor: const Color(0xFFFFF6F6), 
+              color: Colors.transparent, 
+              buttonBackgroundColor: Colors.white, 
               backgroundColor: Colors.transparent,
               height: 60,
               animationCurve: Curves.easeInOut,
