@@ -15,7 +15,7 @@ class TrainingSchedulePage extends StatefulWidget {
 }
 
 class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
-  int _currentIndex = 1;
+  int currentIndex = 1;
   List<Map<String, String>> trainingScheduleList = [
     {
       'ID': '1',
@@ -97,17 +97,6 @@ class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
             ),
           ],
         ),
-      ),
-
-      bottomNavigationBar: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.pink[100]!,
-            Color.fromARGB(255, 244, 229, 186),
-          ],
-        ),
-      ),
       ),
     );
   }

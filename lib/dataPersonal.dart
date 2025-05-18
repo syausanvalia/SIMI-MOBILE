@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dataPersonal2.dart';
-import 'package:simi/dashboard.dart';
-import 'package:simi/infoBerangkat.dart';
-import 'package:simi/trainingSchadule.dart';
 
 void main() {
   runApp(MaterialApp(

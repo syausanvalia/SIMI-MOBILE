@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'custom_navbar.dart';
 import 'forgotPass.dart';
 import 'register.dart';
 
@@ -181,11 +180,21 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   SizedBox(height: 16),
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: AssetImage('assets/google.png'),
+                Material(
+                  color: Colors.transparent,
+                  shape: CircleBorder(),
+                  child: InkWell(
+                    customBorder: CircleBorder(),
+                    onTap: () {
+                      print('Google button clicked');
+                    },
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.transparent,
+                      backgroundImage: AssetImage('assets/google.png'),
+                    ),
                   ),
+                ),
                   SizedBox(height: 16),
                   Text.rich(
                     TextSpan(

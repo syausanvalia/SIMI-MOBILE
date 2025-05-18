@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dataPersonal2.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'dashboard.dart';
 import 'trainingSchadule.dart';

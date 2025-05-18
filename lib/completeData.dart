@@ -1,58 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'dashboard.dart';
-import 'infoBerangkat.dart';
-import 'trainingSchadule.dart';
-
+import 'dataPersonal.dart';
 
 class CompleteDataPage extends StatefulWidget {
-final int activeNavIndex;
-
-  const CompleteDataPage({Key? key, this.activeNavIndex = 1}) : super(key: key);
+  const CompleteDataPage({Key? key}) : super(key: key);
 
   @override
   _CompleteDataPageState createState() => _CompleteDataPageState();
 }
 
 class _CompleteDataPageState extends State<CompleteDataPage> {
-  final Map<String, TextEditingController> controllers = {
-    'ID PMI': TextEditingController(),
-    'Tgl. Pendaftaran': TextEditingController(),
-    'Nama Lengkap': TextEditingController(),
-    'Tempat Lahir': TextEditingController(),
-    'Tgl. Lahir': TextEditingController(),
-    'NIK': TextEditingController(),
-    'No. KK': TextEditingController(),
-    'No. Paspor': TextEditingController(),
-    'No. KTP': TextEditingController(),
-    'No. Ijazah': TextEditingController(),
-    'Full Medical': TextEditingController(),
-    'Pra Medical': TextEditingController(),
-    'Jabatan': TextEditingController(),
-    'Visa': TextEditingController(),
-    'Status Pernikahan': TextEditingController(),
-    'Sponsor': TextEditingController(),
-    'Tgl. Pendaftaran ID': TextEditingController(),
-    'Tgl. Keberangkatan': TextEditingController(),
-    'Tgl. Kepulangan': TextEditingController(),
-    'Pass Foto': TextEditingController(),
-    'Foto Visa': TextEditingController(),
-    'Foto KTP': TextEditingController(),
-    'Foto Akta Kelahiran': TextEditingController(),
-    'Foto KK': TextEditingController(),
-    'SKCK': TextEditingController(),
-    'Foto PP': TextEditingController(),
-    'Foto Surat Izin': TextEditingController(),
-    'Foto Ijazah': TextEditingController(),
-  };
-
+  final Map<String, TextEditingController> controllers = {};
   String selectedOption = 'ex';
-  late int _currentIndex;
+
+  final Map<String, String> previousData = {
+    'ID PMI': '12345',
+    'Tgl. Pendaftaran': '2024-01-01',
+    'Nama Lengkap': 'Dewi Ayu',
+    'Tempat Lahir': 'Bandung',
+    'Tgl. Lahir': '2000-12-12',
+    'NIK': '3201011234567890',
+  };
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.activeNavIndex;
+    for (var key in _formFields) {
+      controllers[key] = TextEditingController(text: previousData[key] ?? '');
+    }
   }
 
   @override
@@ -63,40 +37,92 @@ class _CompleteDataPageState extends State<CompleteDataPage> {
     super.dispose();
   }
 
+  List<String> get _formFields => [
+        'ID PMI',
+        'Tgl. Pendaftaran',
+        'Nama Lengkap',
+        'Tempat Lahir',
+        'Tgl. Lahir',
+        'NIK',
+        'No. KK',
+        'No. Paspor',
+        'No. KTP',
+        'No. Ijazah',
+        'Full Medical',
+        'Pra Medical',
+        'Jabatan',
+        'Visa',
+        'Status Pernikahan',
+        'Sponsor',
+        'Tgl. Pendaftaran ID',
+        'Tgl. Keberangkatan',
+        'Tgl. Kepulangan',
+        'Pass Foto',
+        'Foto Visa',
+        'Foto KTP',
+        'Foto Akta Kelahiran',
+        'Foto KK',
+        'SKCK',
+        'Foto PP',
+        'Foto Surat Izin',
+        'Foto Ijazah',
+      ];
+
+  void _clearData() {
+    for (var controller in controllers.values) {
+      controller.clear();
+    }
+  }
+
+  void _deleteData() {
+    setState(() {
+      for (var controller in controllers.values) {
+        controller.clear();
+      }
+      selectedOption = 'ex';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Data berhasil dihapus'),
+      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
+    ));
+  }
+
+  void _saveData() {
+    print('Data tersimpan!');
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Data berhasil disimpan'),
+      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
+    ));
+  }
+
+  void _navigateToEdit() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PersonalDataPage()), 
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text("Your Personal Data"),
+        foregroundColor: Colors.pinkAccent,
+        elevation: 0,
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Your Personal Data',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 children: [
                   for (var field in controllers.entries)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: TextField(
                         controller: field.value,
+                        enabled: false, // tidak bisa diedit di sini
                         decoration: InputDecoration(
                           labelText: field.key,
                           border: OutlineInputBorder(
@@ -114,11 +140,7 @@ class _CompleteDataPageState extends State<CompleteDataPage> {
                           title: Text(option),
                           value: option,
                           groupValue: selectedOption,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedOption = value!;
-                            });
-                          },
+                          onChanged: null, // disabled
                         ),
                       );
                     }).toList(),
@@ -127,111 +149,47 @@ class _CompleteDataPageState extends State<CompleteDataPage> {
                 ],
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavBar(context),
-      extendBody: true,
-    );
-  }
-
-Widget _buildBottomNavBar(BuildContext context) {
-    final navigationKey = GlobalKey<CurvedNavigationBarState>();
-    final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.pink[100]!,
-            const Color.fromARGB(255, 244, 229, 186),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: CurvedNavigationBar(
-        key: navigationKey,
-        color: const Color.fromARGB(255, 255, 192, 203),
-        buttonBackgroundColor: const Color(0xFFFFF6F6),
-        backgroundColor: Colors.transparent,
-        height: 60,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 300),
-        index: _currentIndex,
-        items: items,
-        onTap: (index) {
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CustomNavBarPage(),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}class CustomNavBarPage extends StatefulWidget {
-  const CustomNavBarPage({super.key});
-
-  @override
-  State<CustomNavBarPage> createState() => _CustomNavBarPageState();
-}
-
-class _CustomNavBarPageState extends State<CustomNavBarPage> {
-  final navigationKey = GlobalKey<CurvedNavigationBarState>();
-  int _currentIndex = 1;
-
-  final pages = [
-    InfoberangkatPage(),
-    Dashboard(),
-    TrainingSchedulePage(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final items = <Widget>[
-      Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      Icon(Icons.home, size: 30, color: Colors.grey),
-      Icon(Icons.calendar_today, size: 30, color: Colors.grey),
-    ];
-
-    return Container(
-      color: Colors.pink[100],
-      child: SafeArea(
-        top: false,
-        child: Scaffold(
-          extendBody: true,
-          backgroundColor: Colors.white,
-          body: pages[_currentIndex],
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.pink.shade100,
-                  const Color.fromARGB(255, 255, 243, 214),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _navigateToEdit,
+                    icon: Icon(Icons.edit),
+                    label: Text('Edit'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _saveData,
+                    icon: Icon(Icons.save),
+                    label: Text('Save'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _clearData,
+                    icon: Icon(Icons.clear),
+                    label: Text('Clear'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _deleteData,
+                    icon: Icon(Icons.delete),
+                    label: Text('Delete'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
+                    ),
+                  ),
                 ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
               ),
-            ),
-            child: CurvedNavigationBar(
-              key: navigationKey,
-              color: Colors.transparent, 
-              buttonBackgroundColor: Colors.white, 
-              backgroundColor: Colors.transparent,
-              height: 60,
-              animationCurve: Curves.easeInOut,
-              animationDuration: const Duration(milliseconds: 300),
-              index: _currentIndex,
-              items: items,
-              onTap: (index) => setState(() => _currentIndex = index),
-            ),
-          ),
+            )
+          ],
         ),
       ),
     );

@@ -225,26 +225,13 @@ class CustomNavBarPage extends StatefulWidget {
 
 class _CustomNavBarPageState extends State<CustomNavBarPage> {
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
-  late int _currentIndex;
+  int _currentIndex = 1;
 
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-  }
-
-  Widget _getPageByIndex(int index) {
-    switch (index) {
-      case 0:
-        return InfoberangkatPage();
-      case 1:
-        return const PaymentPage();
-      case 2:
-        return TrainingSchedulePage();
-      default:
-        return const PaymentPage();
-    }
-  }
+  final pages = [
+    InfoberangkatPage(),
+    Dashboard(),
+    TrainingSchedulePage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +248,7 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
         child: Scaffold(
           extendBody: true,
           backgroundColor: Colors.white,
-          body: _getPageByIndex(_currentIndex),
+          body: pages[_currentIndex],
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(

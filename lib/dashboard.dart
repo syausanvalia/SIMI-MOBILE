@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simi/graduation.dart';
 import 'package:simi/konfirmasiPayment.dart';
+import 'package:simi/login.dart';
 import 'package:simi/trainingSchadule.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'dataPersonal.dart';
@@ -15,7 +16,7 @@ import 'infoBerangkat.dart';
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: Dashboard(),
+    home: CustomNavBarPage(), 
   ));
 }
 
@@ -37,7 +38,22 @@ class _DashboardState extends State<Dashboard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.settings),
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.settings),
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        _showLogoutDialog(context);
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return [
+                        PopupMenuItem(
+                          value: 'logout',
+                          child: Text('Logout'),
+                        ),
+                      ];
+                    },
+                  ),
                   Icon(Icons.person_outline),
                 ],
               ),
@@ -171,7 +187,45 @@ class _DashboardState extends State<Dashboard> {
         ),
       ),
     );
-  }}
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor:Colors.pink[50],
+        title: Text(
+          'Logout Confirmation',
+          style: TextStyle(color: Colors.black),
+          ),
+        content: Text('Are you sure you want to logout?',
+        style: TextStyle(color: Colors.black),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel',
+            style: TextStyle(color: Colors.black),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => LoginPage()),
+                (route) => false,
+              );
+            },
+            child: Text('Logout',
+            style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class CustomNavBarPage extends StatefulWidget {
   final int initialIndex;

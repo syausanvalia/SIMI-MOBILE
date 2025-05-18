@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simi/payment.dart';
-import 'infoPekerjaan.dart';
-import 'payment.dart';
+
 
 class JobDetailPage extends StatelessWidget {
   final Map<String, String> job;
