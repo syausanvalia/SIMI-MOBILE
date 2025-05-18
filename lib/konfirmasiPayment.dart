@@ -4,8 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'dashboard.dart';
-import 'infoBerangkat.dart';
-import 'trainingSchadule.dart';
+import 'berita.dart';
+import 'infoPekerjaan.dart';
 
 class konfirmasiPayment extends StatefulWidget {
   const konfirmasiPayment({Key? key}) : super(key: key);
@@ -107,12 +107,15 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
                 _buildLabel("Status"),
                 _buildDisabledField(_status),
                 const Spacer(),
+                _buildLabel("Status Pelatihan"),
+                _buildDisabledField(_status),
+                const Spacer(),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => Dashboard()),
+                    Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => CustomNavBarPage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -240,14 +243,14 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
     _currentIndex = widget.initialIndex;
   }
 
-  Widget _getPageByIndex(int index) {
+ Widget _getPageByIndex(int index) {
     switch (index) {
       case 0:
-        return InfoberangkatPage();
+        return JobInfoPage();
       case 1:
         return Dashboard();
       case 2:
-        return TrainingSchedulePage();
+        return PopularNewsPage();
       default:
         return Dashboard();
     }
@@ -256,9 +259,9 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      Icon(Icons.work_outline, size: 30, color: Colors.grey),
+      Icon(Icons.home, size: 30, color: Colors.grey),
+      Icon(Icons.newspaper, size: 30, color: Colors.grey),
     ];
 
     return Container(

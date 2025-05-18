@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/berita.dart';
+import 'package:simi/infoPekerjaan.dart';
 import 'dashboard.dart';
-import 'trainingSchadule.dart';
+
 
 void main() {
   runApp(MaterialApp(
@@ -77,6 +79,10 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
                             if (_formKey.currentState!.validate()) {
                               print("Form disimpan");
                             }
+                            Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => CustomNavBarPage()),
+                          );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFFFFD6E8), 
@@ -198,22 +204,22 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   Widget _getPageByIndex(int index) {
     switch (index) {
       case 0:
-        return InfoberangkatPage();
+        return JobInfoPage();
       case 1:
         return Dashboard();
       case 2:
-        return TrainingSchedulePage();
+        return PopularNewsPage();
       default:
         return Dashboard();
     }
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      Icon(Icons.work_outline, size: 30, color: Colors.grey),
+      Icon(Icons.home, size: 30, color: Colors.grey),
+      Icon(Icons.newspaper, size: 30, color: Colors.grey),
     ];
 
     return Container(

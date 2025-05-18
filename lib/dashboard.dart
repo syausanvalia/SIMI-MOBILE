@@ -8,7 +8,6 @@ import 'dataPersonal.dart';
 import 'completeData.dart';
 import 'berita.dart';
 import 'infoPekerjaan.dart';
-import 'payment.dart';
 import 'final_score.dart';
 import 'infoBerangkat.dart';
 
@@ -109,34 +108,32 @@ class _DashboardState extends State<Dashboard> {
             Expanded(
               child: GridView.count(
                 crossAxisCount: 4,
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+                mainAxisSpacing: 7,
                 childAspectRatio: 1,
+                shrinkWrap: true,
                 children: [
+                  _buildMenuItem(Icons.account_box, "personal data", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => PersonalDataPage()));
+                  }),
                   _buildMenuItem(Icons.assignment_turned_in, "complete data", () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => CompleteDataPage()));
+                  }),
+                  _buildMenuItem(Icons.flight_takeoff, "keberangkatan", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => InfoberangkatPage()));
+                  }),
+                  _buildMenuItem('assets/logoKonfirm.png', "confirm payment", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => konfirmasiPayment()));
                   }),
                   _buildMenuItem(Icons.school, "graduation", () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => GraduationPage()));
                   }),
-                  _buildMenuItem(Icons.work_outline, "job information", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => JobInfoPage()));
-                  }),
-                  _buildMenuItem(Icons.account_box, "personal data", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => PersonalDataPage()));
-                  }),
-                  _buildMenuItem('assets/payment.png', "payment", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => PaymentPage()));
-                  }),
-                  _buildMenuItem(Icons.newspaper, "popular news", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => PopularNewsPage()));
+                  _buildMenuItem(Icons.schedule_sharp, "training schadule", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => TrainingSchedulePage()));
                   }),
                   _buildMenuItem(Icons.grade, "final score", () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => FinalScorePage()));
-                  }),
-                  _buildMenuItem('assets/logoKonfirm.png', "confirm payment", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => konfirmasiPayment()));
                   }),
                   SizedBox.shrink(),
                 ],
@@ -244,26 +241,18 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
     super.initState();
     _currentIndex = widget.initialIndex;
   }
-
-  Widget _getPageByIndex(int index) {
-    switch (index) {
-      case 0:
-        return InfoberangkatPage();
-      case 1:
-        return Dashboard();
-      case 2:
-        return TrainingSchedulePage();
-      default:
-        return Dashboard();
-    }
-  }
+  final pages = [
+    JobInfoPage(),
+    Dashboard(),
+    PopularNewsPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      Icon(Icons.work_outline, size: 30, color: Colors.grey),
+      Icon(Icons.home, size: 30, color: Colors.grey),
+      Icon(Icons.newspaper, size: 30, color: Colors.grey),
     ];
 
     return Container(
@@ -273,7 +262,7 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
         child: Scaffold(
           extendBody: true,
           backgroundColor: Colors.white,
-          body: _getPageByIndex(_currentIndex),
+          body: pages[_currentIndex],
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(

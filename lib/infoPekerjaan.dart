@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/berita.dart';
 import 'package:simi/dashboard.dart';
-import 'package:simi/infoBerangkat.dart';
-import 'package:simi/trainingSchadule.dart';
+import 'infoPekerjaan.dart';
 import 'detailPekerjaan.dart';
 
 
@@ -169,11 +169,11 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   Widget _getPageByIndex(int index) {
     switch (index) {
       case 0:
-        return InfoberangkatPage();
+        return JobInfoPage();
       case 1:
         return Dashboard();
       case 2:
-        return TrainingSchedulePage();
+        return PopularNewsPage();
       default:
         return Dashboard();
     }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/berita.dart';
+import 'package:simi/infoPekerjaan.dart';
 import 'dashboard.dart';
-import 'infoBerangkat.dart';
-import 'trainingSchadule.dart';
+import 'berita.dart';
+
+
 void main() {
   runApp(const MaterialApp(
     home: FinalScorePage(),
@@ -51,7 +54,10 @@ class _FinalScorePageState extends State<FinalScorePage> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios_new, size: 20),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CustomNavBarPage()),
+                          );
                     },
                   ),
                 ],
@@ -124,22 +130,23 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   Widget _getPageByIndex(int index) {
     switch (index) {
       case 0:
-        return InfoberangkatPage();
+        return JobInfoPage();
       case 1:
         return Dashboard();
       case 2:
-        return TrainingSchedulePage();
+        return PopularNewsPage();
       default:
         return Dashboard();
     }
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      Icon(Icons.work_outline, size: 30, color: Colors.grey),
+      Icon(Icons.home, size: 30, color: Colors.grey),
+      Icon(Icons.newspaper, size: 30, color: Colors.grey),
     ];
 
     return Container(

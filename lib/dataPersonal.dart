@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:simi/berita.dart';
 import 'dataPersonal2.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -87,7 +89,10 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => CustomNavBarPage()),
+                  );
                     },
                     child: const Icon(Icons.arrow_back_ios_new, size: 20),
                   ),

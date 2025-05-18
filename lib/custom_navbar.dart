@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/berita.dart';
 import 'dashboard.dart';
-import 'infoBerangkat.dart';
-import 'trainingSchadule.dart';
+import 'infoPekerjaan.dart';
+import 'berita.dart';
 
 class CustomNavBarPage extends StatefulWidget {
   const CustomNavBarPage({super.key});
@@ -16,17 +17,17 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   int _currentIndex = 1;
 
   final pages = [
-    InfoberangkatPage(),
+    JobInfoPage(),
     Dashboard(),
-    TrainingSchedulePage(),
+    PopularNewsPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
+      Icon(Icons.work_outline, size: 30, color: Colors.grey),
       Icon(Icons.home, size: 30, color: Colors.grey),
-      Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      Icon(Icons.newspaper, size: 30, color: Colors.grey),
     ];
 
     return Container(
@@ -41,7 +42,7 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.pink.shade100,
+                  const Color.fromRGBO(248, 187, 208, 1),
                   const Color.fromARGB(255, 255, 243, 214),
                 ],
                 begin: Alignment.topCenter,

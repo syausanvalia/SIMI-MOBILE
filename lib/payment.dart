@@ -83,7 +83,9 @@ class PaymentPage extends StatelessWidget {
 
                         const PaymentDetailRow(title: 'ID Pelatihan', value: 'E43252'),
                         const PaymentDetailRow(title: 'Paket Pelatihan', value: 'Paket A'),
-                        const PaymentDetailRow(title: 'Total Pembayaran', value: 'Rp. 15.000.000'),
+                        const PaymentDetailRow(title: 'Status Registrasi', value: 'Rp. 15.000.000'),
+                        const PaymentDetailRow(title: 'Status Pembayaran', value: 'panding'),
+
 
                         const Divider(height: 30, thickness: 1),
 

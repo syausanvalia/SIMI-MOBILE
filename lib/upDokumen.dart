@@ -3,8 +3,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'dashboard.dart';
 import 'dataPersonal2.dart';
-import 'infoBerangkat.dart';
-import 'trainingSchadule.dart';
+import 'berita.dart';
+import 'infoPekerjaan.dart';
 
 class UploadDocumentsPage extends StatefulWidget {
   @override
@@ -184,14 +184,14 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
     _currentIndex = widget.initialIndex;
   }
 
-  Widget _getPageByIndex(int index) {
+ Widget _getPageByIndex(int index) {
     switch (index) {
       case 0:
-        return InfoberangkatPage();
+        return JobInfoPage();
       case 1:
         return Dashboard();
       case 2:
-        return TrainingSchedulePage();
+        return PopularNewsPage();
       default:
         return Dashboard();
     }
@@ -200,9 +200,9 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Icon(Icons.flight_takeoff, size: 30, color: Colors.grey),
-      const Icon(Icons.home, size: 30, color: Colors.grey),
-      const Icon(Icons.calendar_today, size: 30, color: Colors.grey),
+      Icon(Icons.work_outline, size: 30, color: Colors.grey),
+      Icon(Icons.home, size: 30, color: Colors.grey),
+      Icon(Icons.newspaper, size: 30, color: Colors.grey),
     ];
 
     return Container(
