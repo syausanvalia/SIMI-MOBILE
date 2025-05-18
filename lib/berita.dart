@@ -7,33 +7,54 @@ import 'berita.dart';
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: PopularNewsPage(),
+    home: CustomNavBarPage(),
   ));
 }
 
-class PopularNewsPage extends StatelessWidget {
+class PopularNewsPage extends StatefulWidget {
+  @override
+  State<PopularNewsPage> createState() => _PopularNewsPageState();
+}
+
+class _PopularNewsPageState extends State<PopularNewsPage> {
   final List<Map<String, String>> newsList = const [
     {
       'image': 'assets/pasar.jpeg',
       'title': 'Wisata kuliner',
-      'subtitle': 'Night Market Teipei'
+      'description':
+          'Night Market Taipei yang sangat ramai dan dipenuhi dengan berbagai macam makanan khas dari daerah Taiwan, mulai dari makanan laut, camilan manis, minuman segar, hingga hiburan lokal yang meriah dan ramah wisatawan.',
+      'date': '17 Mei 2025'
     },
     {
       'image': 'assets/dibakar.png',
       'title': 'Pria Nekat',
-      'subtitle': 'Jenazah Ayah Dibakar'
+      'description':
+          'Jenazah Ayah Dibakar karena alasan yang masih belum diketahui, polisi sedang menyelidiki kasus ini lebih lanjut dengan memeriksa saksi dan barang bukti serta menunggu hasil forensik dari laboratorium untuk memastikan penyebab kematian.',
+      'date': '16 Mei 2025'
     },
     {
       'image': 'assets/jalaniSumpah.jpeg',
       'title': 'Jay Idzes',
-      'subtitle': 'Rampung jalani pengambilan sumpah'
+      'description':
+          'Rampung jalani pengambilan sumpah sebagai warga negara Indonesia yang sah dan resmi diumumkan oleh Kemenkumham setelah melalui proses naturalisasi dan pengambilan sumpah sesuai hukum yang berlaku.',
+      'date': '15 Mei 2025'
     },
     {
-      'image': 'assets/fotodashboard.jpg',
+      'image': 'assets/fotodashboard2.png',
       'title': 'Berita Promo',
-      'subtitle': 'Promo Sale'
+      'description':
+          'Promo Sale besar-besaran untuk berbagai produk kebutuhan rumah tangga dan elektronik di awal bulan ini, diskon mencapai hingga 70% hanya di beberapa toko tertentu dan berlaku selama persediaan masih ada.',
+      'date': '14 Mei 2025'
     },
   ];
+
+  final Set<int> expandedIndex = {};
+
+  String getShortText(String text) {
+    final words = text.split(' ');
+    final half = (words.length / 2).ceil();
+    return words.sublist(0, half).join(' ') + '...';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,18 +64,6 @@ class PopularNewsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => CustomNavBarPage()),
-                  );
-                },
-                child: const Icon(Icons.arrow_back, size: 28),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -66,71 +75,106 @@ class PopularNewsPage extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 16),
-            SizedBox(
-              height: 190,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
+
+            Expanded(
+              child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: newsList.map((news) {
-                    return Container(
-                      width: 160,
-                      margin: const EdgeInsets.only(right: 16),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.15),
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
+                itemCount: newsList.length,
+                itemBuilder: (context, index) {
+                  final news = newsList[index];
+                  final isExpanded = expandedIndex.contains(index);
+                  final description = news['description']!;
+                  final displayText =
+                      isExpanded ? description : getShortText(description);
+
+                  return AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.15),
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            news['image']!,
+                            height: 80,
+                            width: 100,
+                            fit: BoxFit.cover,
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                            child: Image.asset(
-                              news['image']!,
-                              height: 100,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  news['title']!,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                news['title']!,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  news['subtitle']!,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[700],
-                                  ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                displayText,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[700],
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    news['date']!,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (isExpanded) {
+                                          expandedIndex.remove(index);
+                                        } else {
+                                          expandedIndex.add(index);
+                                        }
+                                      });
+                                    },
+                                    child: Text(
+                                      isExpanded ? "Tutup" : "Selanjutnya",
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
-            const Spacer(),
           ],
         ),
       ),

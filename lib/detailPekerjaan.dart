@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simi/payment.dart';
 
-
 class JobDetailPage extends StatelessWidget {
   final Map<String, String> job;
 
@@ -48,38 +47,9 @@ class JobDetailPage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 12),
-                        Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
-                                'assets/fotodashboard.png', 
-                                height: 150,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                              left: 16,
-                              top: 16,
-                              child: Text(
-                                'Excellent',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      blurRadius: 8,
-                                      color: Colors.black45,
-                                      offset: Offset(2, 2),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+
+                        // Gambar dihapus di sini
+
                         SizedBox(height: 16),
                         Text(
                           'IDK 1.000K',
@@ -114,11 +84,11 @@ class JobDetailPage extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                              builder: (context) => PaymentPage()
-                                   ),
-                                );
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PaymentPage(),
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
@@ -132,7 +102,8 @@ class JobDetailPage extends StatelessWidget {
                             child: Text(
                               'BUY',
                               style: TextStyle(
-                                color: Colors.pinkAccent,
+                                backgroundColor: Colors.pink[100],
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                                 letterSpacing: 1.2,

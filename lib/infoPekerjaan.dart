@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:simi/berita.dart';
 import 'package:simi/dashboard.dart';
-import 'infoPekerjaan.dart';
 import 'detailPekerjaan.dart';
-
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: JobInfoPage(),
+    home: CustomNavBarPage(),
   ));
 }
 
@@ -21,27 +19,27 @@ class JobInfoPage extends StatefulWidget {
 }
 
 class _JobInfoPageState extends State<JobInfoPage> {
- final List<Map<String, String>> jobList = [
+  final List<Map<String, String>> jobList = [
     {
-      'company': 'PT. Si Hao',
-      'position': 'Baby Sitter',
-      'salary': 'IDK 15.000K',
-      'desc':
-          'Dicari tenaga ahli yang berpengalaman dalam mengasuh anak usia 6 tahun dan 12 tahun.'
+      'namaPelatihan': 'Pelatihan Caregiver Dasar',
+      'namaPekerjaan': 'Caregiver Lansia',
+      'negara': 'Jepang',
+      'gaji': 'IDK 18.000K',
+      'desc': 'Merawat dan membantu aktivitas sehari-hari lansia di fasilitas kesehatan dengan pendekatan empatik dan tanggung jawab tinggi.'
     },
     {
-      'company': 'CV. Naspad',
-      'position': 'IT Controller',
-      'salary': 'IDK 20.000K',
-      'desc':
-          'Bagi kalian yang memiliki antusias dalam bidang IT, terutama design grafis, video kreator, DevOps, dll.'
+      'namaPelatihan': 'Pelatihan Keterampilan Rumah Tangga',
+      'namaPekerjaan': 'Housekeeper',
+      'negara': 'Hong Kong',
+      'gaji': 'IDK 15.500K',
+      'desc': 'Bertugas membersihkan, mencuci, memasak, dan mengelola kebutuhan rumah tangga majikan dengan standar kebersihan tinggi.'
     },
     {
-      'company': 'CV. Naspad',
-      'position': 'IT Controller',
-      'salary': 'IDK 20.000K',
-      'desc':
-          'Bagi kalian yang memiliki antusias dalam bidang IT, terutama design grafis, video kreator, DevOps, dll.'
+      'namaPelatihan': 'Pelatihan Asisten Dapur',
+      'namaPekerjaan': 'Kitchen Helper',
+      'negara': 'Taiwan',
+      'gaji': 'IDK 16.000K',
+      'desc': 'Membantu chef dalam menyiapkan bahan masakan, menjaga kebersihan dapur, serta memahami standar keamanan makanan.'
     },
   ];
 
@@ -50,99 +48,107 @@ class _JobInfoPageState extends State<JobInfoPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-            title: Text(
-              "Informasi Pekerjaan",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.pink,
-              ),
-            ),
+        title: Text(
+          "Informasi Pekerjaan",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.pink,
+          ),
+        ),
         leading: BackButton(),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: Expanded(
-        child: ListView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          itemCount: jobList.length,
-          itemBuilder: (context, index) {
-            final job = jobList[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => JobDetailPage(job: job),
-                  ),
-                );
-              },
-              child: Container(
-                margin: EdgeInsets.only(bottom: 16),
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 6,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
+      body: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        itemCount: jobList.length,
+        itemBuilder: (context, index) {
+          final job = jobList[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JobDetailPage(job: job),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      job['company']!,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                        color: Colors.grey[800],
-                      ),
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.only(bottom: 16),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    job['namaPelatihan'] ?? '',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: Colors.grey[800],
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      job['position']!,
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    job['namaPekerjaan'] ?? '',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    job['negara'] ?? '',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  RichText(
+                    text: TextSpan(
+                      text: job['gaji'],
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
+                        color: Colors.black,
                       ),
+                      children: [
+                        TextSpan(
+                          text: "/bulan",
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 12,
+                            color: Colors.grey[700],
+                          ),
+                        )
+                      ],
                     ),
-                    SizedBox(height: 8),
-                    RichText(
-                      text: TextSpan(
-                        text: job['salary'],
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "/bulan",
-                            style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12,
-                              color: Colors.grey[700],
-                            ),
-                          )
-                        ],
-                      ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    job['desc'] ?? '',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[700],
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      job['desc']!,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -224,4 +230,3 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
     );
   }
 }
-
