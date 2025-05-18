@@ -48,8 +48,6 @@ class JobDetailPage extends StatelessWidget {
                         ),
                         SizedBox(height: 12),
 
-                        // Gambar dihapus di sini
-
                         SizedBox(height: 16),
                         Text(
                           'IDK 1.000K',
@@ -83,34 +81,29 @@ class JobDetailPage extends StatelessWidget {
                         Center(
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PaymentPage(),
-                                ),
-                              );
+                            Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => PaymentPage()),
+                          );
                             },
                             style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                              backgroundColor: Colors.pink[100]!,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              backgroundColor: Colors.white,
-                              shadowColor: Colors.pinkAccent,
-                              elevation: 5,
+                              elevation: 4,
                             ),
-                            child: Text(
+                            child: const Text(
                               'BUY',
                               style: TextStyle(
-                                backgroundColor: Colors.pink[100],
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                letterSpacing: 1.2,
+                                fontSize: 15,
                               ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

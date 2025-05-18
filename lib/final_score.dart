@@ -3,7 +3,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:simi/berita.dart';
 import 'package:simi/infoPekerjaan.dart';
 import 'dashboard.dart';
-import 'berita.dart';
+
 
 
 void main() {

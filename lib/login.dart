@@ -12,8 +12,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool passwordVisible = false;
-  bool rememberMe = false;
-
+  
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -28,9 +27,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void _validateInputs() {
     setState(() {
-      isButtonEnabled = _usernameController.text.isNotEmpty &&
-          _passwordController.text.isNotEmpty &&
-          rememberMe;
+      isButtonEnabled =
+          _usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty;
     });
   }
 
@@ -56,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     "Welcome back",
                     style: TextStyle(
                       fontSize: 28,
@@ -70,20 +68,20 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     "Log in to your account here!",
                     style: TextStyle(color: Colors.grey),
                   ),
-                  SizedBox(height: 24),
-                  buildInputField(Icons.person, 'Username', _usernameController),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 24),
+                  _buildInputField(Icons.person, 'Username', _usernameController),
+                  const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
                     obscureText: !passwordVisible,
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      prefixIcon: Icon(Icons.lock_outline),
+                      prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
                           passwordVisible ? Icons.visibility : Icons.visibility_off,
@@ -99,43 +97,25 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Switch(
-                            value: rememberMe,
-                            activeColor: Colors.pink.shade200,
-                            onChanged: (value) {
-                              setState(() {
-                                rememberMe = value;
-                                _validateInputs();
-                              });
-                            },
-                          ),
-                          Text("Remember me"),
-                        ],
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
-                          );
-                        },
-                        child: Text(
-                          "Forgot?",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            decoration: TextDecoration.underline,
-                          ),
+                      child: const Text(
+                        "Forgot?",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
+
                   Container(
                     width: double.infinity,
                     height: 50,
@@ -143,10 +123,10 @@ class _LoginPageState extends State<LoginPage> {
                       gradient: LinearGradient(
                         colors: [
                           Colors.pink.shade100,
-                          Color.fromARGB(255, 255, 243, 214),
+                          const Color.fromARGB(255, 255, 243, 214),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: ElevatedButton(
                       onPressed: isButtonEnabled ? _handleLogin : null,
@@ -156,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                         foregroundColor: Colors.black,
                         disabledBackgroundColor: Colors.grey.shade300,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: const Text(
@@ -168,48 +148,46 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
-                    children: [
+                    children: const [
                       Expanded(child: Divider()),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         child: Text("or"),
                       ),
                       Expanded(child: Divider()),
                     ],
                   ),
-                  SizedBox(height: 16),
-                Material(
-                  color: Colors.transparent,
-                  shape: CircleBorder(),
-                  child: InkWell(
-                    customBorder: CircleBorder(),
-                    onTap: () {
-                      print('Google button clicked');
-                    },
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: AssetImage('assets/google.png'),
+                  const SizedBox(height: 16),
+                  Material(
+                    color: Colors.transparent,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () {
+            
+                      },
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: AssetImage('assets/google.png'),
+                      ),
                     ),
                   ),
-                ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text.rich(
                     TextSpan(
                       text: "Don't have an account yet? ",
                       children: [
                         TextSpan(
                           text: "Click here",
-                          style: TextStyle(color: Colors.blue),
+                          style: const TextStyle(color: Colors.blue),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => RegisterPage()),
-                              );
-                            },
+                            ..onTap = () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>  RegisterPage()),
+                                ),
                         ),
                       ],
                     ),
@@ -223,7 +201,8 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget buildInputField(IconData icon, String hintText, TextEditingController controller) {
+  Widget _buildInputField(
+      IconData icon, String hintText, TextEditingController controller) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -234,4 +213,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }}
+  }
+}

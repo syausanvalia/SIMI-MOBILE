@@ -81,7 +81,7 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Konfirmasi Pembayaran",
+                  "Pending",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -89,8 +89,6 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildLabel("ID Pelatihan"),
-                _buildDisabledField("E43252"),
                 _buildLabel("Kode Invoice"),
                 _buildInputField(_kodeInvoiceController, "Masukkan Kode Invoice"),
                 _buildLabel("Tgl. Transfer"),
@@ -104,10 +102,9 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
                     padding: const EdgeInsets.only(top: 8),
                     child: Image.file(_buktiTransfer!, height: 100),
                   ),
-                _buildLabel("Status"),
+                _buildLabel("Status Pembayaran"),
                 _buildDisabledField(_status),
-                const Spacer(),
-                _buildLabel("Status Pelatihan"),
+                _buildLabel("Status Registrasi"),
                 _buildDisabledField(_status),
                 const Spacer(),
                 Center(
