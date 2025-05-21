@@ -9,7 +9,8 @@ import 'auth_middleware.dart';
 class ApiService {
   static const String baseUrl = 'http://127.0.0.1:8000';
 
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/api/auth/login'),
@@ -59,8 +60,10 @@ class ApiService {
         };
       } else {
         // Flutter Mobile → WebAuth
-        final redirectUrl = Uri.parse('$baseUrl/api/auth/google?platform=mobile');
-        final callbackUrlScheme = 'com.example.simi'; // Sesuaikan dengan Android/iOS config
+        final redirectUrl =
+            Uri.parse('$baseUrl/api/auth/google?platform=mobile');
+        final callbackUrlScheme =
+            'com.example.simi'; // Sesuaikan dengan Android/iOS config
 
         final result = await FlutterWebAuth.authenticate(
           url: redirectUrl.toString(),
@@ -77,7 +80,8 @@ class ApiService {
           };
         }
 
-        final decodedJson = json.decode(utf8.decode(base64.decode(encodedData)));
+        final decodedJson =
+            json.decode(utf8.decode(base64.decode(encodedData)));
         final status = decodedJson['status'] ?? false;
         final message = decodedJson['message'] ?? 'Login gagal';
         final token = decodedJson['token'];
@@ -104,4 +108,126 @@ class ApiService {
       };
     }
   }
+
+  static Future<Map<String, dynamic>> register(String username, String email,
+      String password, String noTelp, String jk) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/register'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'username': username,
+          'email': email,
+          'password': password,
+          'no_telp': noTelp,
+          'JK': jk,
+        }),
+      );
+
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 201 && data['status'] == true) {
+        await AuthMiddleware.saveAuthData(data['token'], data['data']);
+        return {
+          'success': true,
+          'data': data['data'],
+          'token': data['token'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Registrasi gagal',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Terjadi kesalahan: $e',
+      };
+    }
+  }
+
+  static Future<bool> logout() async {
+  final token = await AuthMiddleware.getToken();
+
+  if (token != null && token.isNotEmpty) {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/logout'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+    } catch (e) {
+      print("❌ Error saat kirim logout: $e");
+    }
+  }
+
+  await AuthMiddleware.logout(); // Tetap bersihkan data lokal
+  return true;
+}
+
+
+  static Future<bool> isAuthenticated() async {
+  final token = await AuthMiddleware.getToken();
+  if (token == null || token.isEmpty) return false;
+
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/check-token'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    return response.statusCode == 200;
+  } catch (_) {
+    return false;
+  }
+}
+static Future<Map<String, dynamic>> getDashboard() async {
+  final token = await AuthMiddleware.getToken();
+  if (token == null || token.isEmpty) {
+    return {
+      'success': false,
+      'message': 'Token tidak ditemukan',
+    };
+  }
+
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/auth/dashboard'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 && data['status'] == true) {
+      return {
+        'success': true,
+        'data': data['data'],
+      };
+    } else {
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Gagal memuat dashboard',
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Terjadi kesalahan: $e',
+    };
+  }
+}
+
 }

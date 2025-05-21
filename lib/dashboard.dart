@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simi/api_services.dart';
 import 'package:simi/graduation.dart';
 import 'package:simi/konfirmasiPayment.dart';
 import 'package:simi/login.dart';
@@ -11,11 +12,10 @@ import 'infoPekerjaan.dart';
 import 'final_score.dart';
 import 'infoBerangkat.dart';
 
-
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: CustomNavBarPage(), 
+    home: CustomNavBarPage(),
   ));
 }
 
@@ -25,6 +25,37 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  String welcomeMessage = "";
+bool isLoading = true;
+bool hasError = false;
+
+@override
+void initState() {
+  super.initState();
+  fetchDashboardData();
+}
+
+Future<void> fetchDashboardData() async {
+  try {
+    final data = await ApiService.getDashboard();
+    print("RESPON DASHBOARD: $data"); // Debug log, opsional
+
+    setState(() {
+      welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
+      isLoading = false;
+    });
+  } catch (e) {
+    print("ERROR DASHBOARD: $e");
+    setState(() {
+      welcomeMessage = "Gagal memuat data";
+      hasError = true;
+      isLoading = false;
+    });
+  }
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,14 +126,17 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  "More",
+                child: isLoading
+                    ? CircularProgressIndicator()
+                    : Text(
+                  welcomeMessage,
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 250, 195, 213),
-                  ),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 250, 195, 213),
                 ),
+              ),
+
               ),
             ),
             Expanded(
@@ -144,6 +178,8 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
+}
+
 
   Widget _buildMenuItem(dynamic icon, String label, VoidCallback onTap) {
     Widget iconWidget;
@@ -190,39 +226,58 @@ class _DashboardState extends State<Dashboard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor:Colors.pink[50],
+        backgroundColor: Colors.pink[50],
         title: Text(
           'Logout Confirmation',
           style: TextStyle(color: Colors.black),
-          ),
-        content: Text('Are you sure you want to logout?',
-        style: TextStyle(color: Colors.black),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(color: Colors.black),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel',
-            style: TextStyle(color: Colors.black),
-            ),
-          ),
+          // Tombol batal
           TextButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => LoginPage()),
-                (route) => false,
-              );
+              Navigator.of(ctx).pop(); // Tutup dialog
             },
-            child: Text('Logout',
-            style: TextStyle(color: Colors.black),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          // Tombol logout
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop(); // Tutup dialog dulu
+
+              final success = await ApiService.logout();
+
+              if (success) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginPage()),
+                  (route) => false,
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Gagal logout. Silakan coba lagi.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: Text(
+              'Logout',
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ],
       ),
     );
   }
-}
+
 
 class CustomNavBarPage extends StatefulWidget {
   final int initialIndex;
@@ -241,6 +296,7 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
     super.initState();
     _currentIndex = widget.initialIndex;
   }
+
   final pages = [
     JobInfoPage(),
     Dashboard(),
