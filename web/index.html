@@ -32,6 +32,12 @@
   <title>simi</title>
   <link rel="manifest" href="manifest.json">
 </head>
+<script>
+  window.getGoogleAuthToken = function() {
+    return localStorage.getItem("google_auth_token");
+  }
+</script>
+
 <body>
   <script src="flutter_bootstrap.js" async></script>
 </body>

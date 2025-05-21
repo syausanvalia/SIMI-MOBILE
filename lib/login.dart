@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'forgotPass.dart';
 import 'register.dart';
+import 'api_services.dart';
+import 'auth_middleware.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,8 +15,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool passwordVisible = false;
-  
-  final TextEditingController _usernameController = TextEditingController();
+  bool isLoading = false;
+
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool isButtonEnabled = false;
@@ -21,26 +25,90 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _usernameController.addListener(_validateInputs);
+    _emailController.addListener(_validateInputs);
     _passwordController.addListener(_validateInputs);
+    _checkAuthentication();
+  }
+
+  // Cek apakah user sudah login
+  void _checkAuthentication() async {
+    if (await AuthMiddleware.isAuthenticated()) {
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    }
   }
 
   void _validateInputs() {
     setState(() {
-      isButtonEnabled =
-          _usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty;
+      isButtonEnabled = _emailController.text.isNotEmpty &&
+          _passwordController.text.isNotEmpty;
     });
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
-    Navigator.pushReplacementNamed(context, '/dashboard');
+  void _handleLogin() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final result = await ApiService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      if (result['success']) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'] ?? 'Login failed')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _handleGoogleLogin() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final result = await ApiService.loginWithGoogle();
+
+      if (result['success']) {
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'] ?? 'Google login failed')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error during Google login: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -74,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 24),
-                  _buildInputField(Icons.person, 'Username', _usernameController),
+                  _buildInputField(Icons.email, 'Email', _emailController),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
@@ -84,7 +152,9 @@ class _LoginPageState extends State<LoginPage> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          passwordVisible ? Icons.visibility : Icons.visibility_off,
+                          passwordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
@@ -103,7 +173,8 @@ class _LoginPageState extends State<LoginPage> {
                     child: GestureDetector(
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                        MaterialPageRoute(
+                            builder: (context) => ForgotPasswordPage()),
                       ),
                       child: const Text(
                         "Forgot?",
@@ -115,7 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
                   Container(
                     width: double.infinity,
                     height: 50,
@@ -129,7 +199,9 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: ElevatedButton(
-                      onPressed: isButtonEnabled ? _handleLogin : null,
+                      onPressed: isLoading
+                          ? null
+                          : (isButtonEnabled ? _handleLogin : null),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
@@ -139,13 +211,15 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -165,9 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                     shape: const CircleBorder(),
                     child: InkWell(
                       customBorder: const CircleBorder(),
-                      onTap: () {
-            
-                      },
+                      onTap: isLoading ? null : _handleGoogleLogin,
                       child: const CircleAvatar(
                         radius: 20,
                         backgroundColor: Colors.transparent,
@@ -186,7 +258,8 @@ class _LoginPageState extends State<LoginPage> {
                           recognizer: TapGestureRecognizer()
                             ..onTap = () => Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) =>  RegisterPage()),
+                                  MaterialPageRoute(
+                                      builder: (context) => RegisterPage()),
                                 ),
                         ),
                       ],
@@ -205,6 +278,7 @@ class _LoginPageState extends State<LoginPage> {
       IconData icon, String hintText, TextEditingController controller) {
     return TextField(
       controller: controller,
+      keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         prefixIcon: Icon(icon),
         hintText: hintText,
