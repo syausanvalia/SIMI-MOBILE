@@ -7,7 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'auth_middleware.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl =
+      'https://saddlebrown-louse-528508.hostingersite.com';
 
   static Future<Map<String, dynamic>> login(
       String email, String password) async {
@@ -154,80 +155,314 @@ class ApiService {
   }
 
   static Future<bool> logout() async {
-  final token = await AuthMiddleware.getToken();
+    final token = await AuthMiddleware.getToken();
 
-  if (token != null && token.isNotEmpty) {
+    if (token != null && token.isNotEmpty) {
+      try {
+        final response = await http.post(
+          Uri.parse('$baseUrl/api/auth/logout'),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+      } catch (e) {
+        print("❌ Error saat kirim logout: $e");
+      }
+    }
+
+    await AuthMiddleware.logout();
+    return true;
+  }
+
+  static Future<bool> isAuthenticated() async {
+    final token = await AuthMiddleware.getToken();
+    if (token == null || token.isEmpty) return false;
+
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/logout'),
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/check-token'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
       );
-    } catch (e) {
-      print("❌ Error saat kirim logout: $e");
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
     }
   }
 
-  await AuthMiddleware.logout(); // Tetap bersihkan data lokal
-  return true;
-}
-
-
-  static Future<bool> isAuthenticated() async {
-  final token = await AuthMiddleware.getToken();
-  if (token == null || token.isEmpty) return false;
-
-  try {
-    final response = await http.get(
-      Uri.parse('$baseUrl/api/check-token'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    return response.statusCode == 200;
-  } catch (_) {
-    return false;
-  }
-}
-static Future<Map<String, dynamic>> getDashboard() async {
-  final token = await AuthMiddleware.getToken();
-  if (token == null || token.isEmpty) {
-    return {
-      'success': false,
-      'message': 'Token tidak ditemukan',
-    };
-  }
-
-  try {
-    final response = await http.get(
-      Uri.parse('$baseUrl/api/auth/dashboard'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200 && data['status'] == true) {
-      return {
-        'success': true,
-        'data': data['data'],
-      };
-    } else {
+  static Future<Map<String, dynamic>> getDashboard() async {
+    final token = await AuthMiddleware.getToken();
+    if (token == null || token.isEmpty) {
       return {
         'success': false,
-        'message': data['message'] ?? 'Gagal memuat dashboard',
+        'message': 'Token tidak ditemukan',
       };
     }
-  } catch (e) {
-    return {
-      'success': false,
-      'message': 'Terjadi kesalahan: $e',
-    };
-  }
-}
 
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/auth/dashboard'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {
+          'success': true,
+          'data': data['data'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Gagal memuat dashboard',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Terjadi kesalahan: $e',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> sendOtp(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/forgot-password'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'email': email}),
+      );
+
+      final data = jsonDecode(response.body);
+      return {
+        'success': response.statusCode == 200,
+        'message': data['message'],
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: $e',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> verifyOtp(
+      String email, String otp) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/verify-opt'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+      return {
+        'success': response.statusCode == 200,
+        'message': data['message'],
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: $e',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> resetPassword(String email, String otp,
+      String password, String passwordConfirmation) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/reset-password'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+      return {
+        'success': response.statusCode == 200,
+        'message': data['message'],
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error: $e',
+      };
+    }
+  }
+
+  static Future<List<dynamic>> getNews({String? token}) async {
+    try {
+      token ??= await AuthMiddleware.getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/auth/news'),
+        headers: {
+          'Accept': 'application/json',
+          if (token != null && token.isNotEmpty)
+            'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['status'] == true) {
+        return data['data'];
+      } else {
+        throw Exception(data['message'] ?? 'Gagal memuat berita');
+      }
+    } catch (e) {
+      throw Exception('Gagal terhubung ke API: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getJobs() async {
+    try {
+      final token = await AuthMiddleware.getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/auth/jobs'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        return List<Map<String, dynamic>>.from(data['data']);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getTrainings() async {
+    try {
+      final token = await AuthMiddleware.getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/auth/trainings'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        return List<Map<String, dynamic>>.from(data['data']);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> getTrainingRegistrations() async {
+    try {
+      final token = await AuthMiddleware.getToken();
+      if (token == null) {
+        throw Exception('Token tidak ditemukan. Silakan login ulang.');
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/auth/training-registrations'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['status'] == true || data['success'] == true) {
+          return {
+            'success': true,
+            'data': data['data'] ?? [],
+          };
+        } else {
+          return {
+            'success': false,
+            'message': data['message'] ?? 'Gagal mengambil data.',
+          };
+        }
+      } else {
+        return {
+          'success': false,
+          'message': 'Gagal mengambil data. Status: ${response.statusCode}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Terjadi kesalahan: $e',
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> postTrainingRegistration(
+      int trainingId) async {
+    try {
+      final token = await AuthMiddleware.getToken();
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/training-registrations'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'training_id': trainingId,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 201 && data['status'] == true) {
+        return {
+          'success': true,
+          'message': data['message'],
+          'data': data['data'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Pendaftaran gagal',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Terjadi kesalahan: $e',
+      };
+    }
+  }
 }

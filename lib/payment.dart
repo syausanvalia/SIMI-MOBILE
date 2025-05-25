@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/detailPekerjaan.dart';
 import 'package:simi/konfirmasiPayment.dart';
 import 'dashboard.dart';
 import 'infoBerangkat.dart';
 import 'trainingSchadule.dart';
+import 'package:intl/intl.dart';
+import 'training_cart_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,6 +14,11 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+String formatRupiah(int number) {
+  final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp. ', decimalDigits: 0);
+  return formatCurrency.format(number);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +30,17 @@ class MyApp extends StatelessWidget {
 }
 
 class PaymentPage extends StatelessWidget {
-  const PaymentPage({super.key});
+  final int id;
+  final String trainingName;
+  final int price;
+
+  const PaymentPage({
+    Key? key,
+    required this.id,
+    required this.trainingName,
+    required this.price,
+  }) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +99,10 @@ class PaymentPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
 
-                        const PaymentDetailRow(title: 'ID Pelatihan', value: 'E43252'),
-                        const PaymentDetailRow(title: 'Kelas Pelatihan', value: 'Paket A'),
-                        const PaymentDetailRow(title: 'Harga', value: 'Rp. 15.000.000'),
+                      PaymentDetailRow(title: 'ID Pelatihan', value: id.toString()),
+                      PaymentDetailRow(title: 'Kelas Pelatihan', value: trainingName),
+                      PaymentDetailRow(title: 'Harga', value: formatRupiah(price)),
+
 
 
                         const Divider(height: 30, thickness: 1),

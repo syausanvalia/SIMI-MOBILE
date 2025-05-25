@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:simi/berita.dart';
 import 'dataPersonal2.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'custom_navbar.dart';
 
 void main() {
   runApp(MaterialApp(

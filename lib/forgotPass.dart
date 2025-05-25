@@ -1,15 +1,17 @@
+// forgotpass.dart
+
 import 'package:flutter/material.dart';
 import 'verification.dart';
+import 'api_services.dart';
 
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: ForgotPasswordPage(),
-  ));
+class ForgotPasswordPage extends StatefulWidget {
+  @override
+  _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
 }
 
-class ForgotPasswordPage extends StatelessWidget {
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController emailController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +68,9 @@ class ForgotPasswordPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     gradient: LinearGradient(
                       colors: [
-                          Colors.pink.shade100,
-                          const Color.fromARGB(255, 255, 243, 214),
-                        ],
+                        Colors.pink.shade100,
+                        const Color.fromARGB(255, 255, 243, 214),
+                      ],
                     ),
                   ),
                   child: Material(
@@ -76,42 +78,22 @@ class ForgotPasswordPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        final email = emailController.text.trim();
-
-                        if (email.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Email cannot be empty"),
-                              backgroundColor: Colors.blue,
-                            ),
-                          );
-                        } else if (!email.endsWith("@gmail.com")) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Only @gmail.com email is accepted"),
-                              backgroundColor: Colors.blue,
-                            ),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VerificationPage(),
-                            ),
-                          );
-                        }
-                      },
+                      onTap: isLoading ? null : _handleSubmit,
                       child: Center(
-                        child: Text(
-                          "NEXT",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
+                        child: isLoading
+                            ? CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.black),
+                              )
+                            : Text(
+                                "NEXT",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.5,
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -122,5 +104,44 @@ class ForgotPasswordPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleSubmit() async {
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Email cannot be empty")),
+      );
+      return;
+    }
+
+    if (!email.endsWith("@gmail.com")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Only @gmail.com email is accepted")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final result = await ApiService.sendOtp(email);
+
+      if (result['success']) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerificationPage(email: email),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+      }
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 }

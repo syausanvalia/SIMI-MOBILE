@@ -11,6 +11,8 @@ import 'berita.dart';
 import 'infoPekerjaan.dart';
 import 'final_score.dart';
 import 'infoBerangkat.dart';
+import 'daftar_kelas_page.dart'; 
+import 'package:simi/training_cart_page.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -26,35 +28,32 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   String welcomeMessage = "";
-bool isLoading = true;
-bool hasError = false;
+  bool isLoading = true;
+  bool hasError = false;
 
-@override
-void initState() {
-  super.initState();
-  fetchDashboardData();
-}
-
-Future<void> fetchDashboardData() async {
-  try {
-    final data = await ApiService.getDashboard();
-    print("RESPON DASHBOARD: $data"); // Debug log, opsional
-
-    setState(() {
-      welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
-      isLoading = false;
-    });
-  } catch (e) {
-    print("ERROR DASHBOARD: $e");
-    setState(() {
-      welcomeMessage = "Gagal memuat data";
-      hasError = true;
-      isLoading = false;
-    });
+  @override
+  void initState() {
+    super.initState();
+    fetchDashboardData();
   }
-}
 
-
+  Future<void> fetchDashboardData() async {
+    try {
+      final data = await ApiService.getDashboard();
+      print("RESPON DASHBOARD: $data");
+      setState(() {
+        welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
+        isLoading = false;
+      });
+    } catch (e) {
+      print("ERROR DASHBOARD: $e");
+      setState(() {
+        welcomeMessage = "Gagal memuat data";
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +83,16 @@ Future<void> fetchDashboardData() async {
                       ];
                     },
                   ),
-                  Icon(Icons.person_outline),
-                ],
+                  IconButton(
+                  icon: Icon(Icons.shopping_cart_outlined),
+                  onPressed: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => TrainingCartPage()),
+                  );
+                  },
+                   ),
+                   ],
               ),
             ),
             Container(
@@ -129,14 +136,13 @@ Future<void> fetchDashboardData() async {
                 child: isLoading
                     ? CircularProgressIndicator()
                     : Text(
-                  welcomeMessage,
-                  style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 250, 195, 213),
-                ),
-              ),
-
+                        welcomeMessage,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 250, 195, 213),
+                        ),
+                      ),
               ),
             ),
             Expanded(
@@ -169,7 +175,10 @@ Future<void> fetchDashboardData() async {
                   _buildMenuItem(Icons.grade, "final score", () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => FinalScorePage()));
                   }),
-                  SizedBox.shrink(),
+                  // Menu tambahan: DAFTAR KELAS
+                  _buildMenuItem(Icons.class_, "daftar kelas", () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarKelasPage()));
+                  }),
                 ],
               ),
             ),
@@ -178,8 +187,6 @@ Future<void> fetchDashboardData() async {
       ),
     );
   }
-}
-
 
   Widget _buildMenuItem(dynamic icon, String label, VoidCallback onTap) {
     Widget iconWidget;
@@ -236,20 +243,15 @@ Future<void> fetchDashboardData() async {
           style: TextStyle(color: Colors.black),
         ),
         actions: [
-          // Tombol batal
           TextButton(
             onPressed: () {
-              Navigator.of(ctx).pop(); // Tutup dialog
+              Navigator.of(ctx).pop();
             },
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.black),
-            ),
+            child: Text('Cancel', style: TextStyle(color: Colors.black)),
           ),
-          // Tombol logout
           TextButton(
             onPressed: () async {
-              Navigator.of(ctx).pop(); // Tutup dialog dulu
+              Navigator.of(ctx).pop();
 
               final success = await ApiService.logout();
 
@@ -268,16 +270,13 @@ Future<void> fetchDashboardData() async {
                 );
               }
             },
-            child: Text(
-              'Logout',
-              style: TextStyle(color: Colors.black),
-            ),
+            child: Text('Logout', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
     );
   }
-
+}
 
 class CustomNavBarPage extends StatefulWidget {
   final int initialIndex;

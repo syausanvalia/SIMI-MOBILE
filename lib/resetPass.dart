@@ -1,14 +1,27 @@
+// resetpass.dart
 import 'package:flutter/material.dart';
 import 'login.dart';
+import 'success.dart';
+import 'api_services.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: ResetPasswordPage(),
+    home: ResetPasswordPage(email: '', otp: ''), // Berikan nilai default untuk testing
     debugShowCheckedModeBanner: false,
   ));
 }
 
 class ResetPasswordPage extends StatefulWidget {
+  final String email;
+  final String otp;
+
+  // Tambahkan konstruktor dengan required parameters
+  const ResetPasswordPage({
+    Key? key, 
+    required this.email, 
+    required this.otp
+  }) : super(key: key);
+
   @override
   _ResetPasswordPageState createState() => _ResetPasswordPageState();
 }
@@ -16,6 +29,65 @@ class ResetPasswordPage extends StatefulWidget {
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool passwordVisible = false;
   bool repeatPasswordVisible = false;
+  bool isLoading = false;
+  
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController repeatPasswordController = TextEditingController();
+
+  Future<void> _handleResetPassword() async {
+    final password = passwordController.text;
+    final repeatPassword = repeatPasswordController.text;
+
+    if (password.isEmpty || repeatPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password must be at least 8 characters')),
+      );
+      return;
+    }
+
+    if (password != repeatPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final result = await ApiService.resetPassword(
+        widget.email,
+        widget.otp,
+        password,
+        repeatPassword,
+      );
+
+      if (result['success']) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => SuccessPage()),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred. Please try again.')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +109,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               ),
               const SizedBox(height: 24),
               buildPasswordField(
+                controller: passwordController,
                 hintText: 'password',
                 obscureText: !passwordVisible,
                 toggleVisibility: () {
@@ -48,6 +121,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               ),
               const SizedBox(height: 16),
               buildPasswordField(
+                controller: repeatPasswordController,
                 hintText: 'repeat password',
                 obscureText: !repeatPasswordVisible,
                 toggleVisibility: () {
@@ -72,13 +146,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ElevatedButton(
-                    onPressed: () {
-                     
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
-                    },
+                    onPressed: isLoading ? null : _handleResetPassword,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
@@ -87,13 +155,22 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'SAVE',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
+                    child: isLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                            ),
+                          )
+                        : const Text(
+                            'SAVE',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -105,12 +182,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Widget buildPasswordField({
+    required TextEditingController controller,
     required String hintText,
     required bool obscureText,
     required VoidCallback toggleVisibility,
     required bool isVisible,
   }) {
     return TextField(
+      controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hintText,
