@@ -15,10 +15,11 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-String formatRupiah(int number) {
-  final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp. ', decimalDigits: 0);
-  return formatCurrency.format(number);
-}
+  String formatRupiah(int number) {
+    final formatCurrency = NumberFormat.currency(
+        locale: 'id_ID', symbol: 'Rp. ', decimalDigits: 0);
+    return formatCurrency.format(number);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,6 @@ class PaymentPage extends StatelessWidget {
     required this.price,
   }) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +63,7 @@ class PaymentPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.pink[300], 
+                      color: Colors.pink[300],
                     ),
                   ),
                 ],
@@ -98,15 +98,13 @@ class PaymentPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                      PaymentDetailRow(title: 'ID Pelatihan', value: id.toString()),
-                      PaymentDetailRow(title: 'Kelas Pelatihan', value: trainingName),
-                      PaymentDetailRow(title: 'Harga', value: formatRupiah(price)),
-
-
-
+                        PaymentDetailRow(
+                            title: 'ID Pelatihan', value: id.toString()),
+                        PaymentDetailRow(
+                            title: 'Kelas Pelatihan', value: trainingName),
+                        PaymentDetailRow(
+                            title: 'Harga', value: formatRupiah(price)),
                         const Divider(height: 30, thickness: 1),
-
                         const PaymentBankItem(
                           imagePath: 'assets/bni.png',
                           name: 'Valiaa Cecann',
@@ -122,7 +120,6 @@ class PaymentPage extends StatelessWidget {
                           name: 'Syausan',
                           accountNumber: '089515783937',
                         ),
-
                         const SizedBox(height: 24),
                         Container(
                           padding: const EdgeInsets.all(12),
@@ -141,13 +138,16 @@ class PaymentPage extends StatelessWidget {
                         Center(
                           child: ElevatedButton(
                             onPressed: () {
-                            Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => konfirmasiPayment()),
-                          );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        konfirmasiPayment(trainingId: id)),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 50, vertical: 14),
                               backgroundColor: Colors.pink[100]!,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),

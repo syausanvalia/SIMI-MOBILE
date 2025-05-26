@@ -11,7 +11,7 @@ import 'berita.dart';
 import 'infoPekerjaan.dart';
 import 'final_score.dart';
 import 'infoBerangkat.dart';
-import 'daftar_kelas_page.dart'; 
+import 'daftar_kelas_page.dart';
 import 'package:simi/training_cart_page.dart';
 
 void main() {
@@ -84,15 +84,15 @@ class _DashboardState extends State<Dashboard> {
                     },
                   ),
                   IconButton(
-                  icon: Icon(Icons.shopping_cart_outlined),
-                  onPressed: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => TrainingCartPage()),
-                  );
-                  },
-                   ),
-                   ],
+                    icon: Icon(Icons.shopping_cart_outlined),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => TrainingCartPage()),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
             Container(
@@ -130,7 +130,8 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: isLoading
@@ -155,29 +156,36 @@ class _DashboardState extends State<Dashboard> {
                 shrinkWrap: true,
                 children: [
                   _buildMenuItem(Icons.account_box, "personal data", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => PersonalDataPage()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => PersonalDataPage()));
                   }),
-                  _buildMenuItem(Icons.assignment_turned_in, "complete data", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => CompleteDataPage()));
+                  _buildMenuItem(Icons.assignment_turned_in, "complete data",
+                      () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => CompleteDataPage()));
                   }),
                   _buildMenuItem(Icons.flight_takeoff, "keberangkatan", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => InfoberangkatPage()));
-                  }),
-                  _buildMenuItem('assets/logoKonfirm.png', "confirm payment", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => konfirmasiPayment()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => InfoberangkatPage()));
                   }),
                   _buildMenuItem(Icons.school, "graduation", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => GraduationPage()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => GraduationPage()));
                   }),
                   _buildMenuItem(Icons.schedule_sharp, "training schadule", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => TrainingSchedulePage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => TrainingSchedulePage()));
                   }),
                   _buildMenuItem(Icons.grade, "final score", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => FinalScorePage()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => FinalScorePage()));
                   }),
                   // Menu tambahan: DAFTAR KELAS
                   _buildMenuItem(Icons.class_, "daftar kelas", () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => DaftarKelasPage()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => DaftarKelasPage()));
                   }),
                 ],
               ),
