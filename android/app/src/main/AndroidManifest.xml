@@ -3,7 +3,9 @@
 
     <!-- Izin untuk akses Internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    
     <application
         android:name="${applicationName}"
         android:label="simi"
@@ -16,17 +18,7 @@
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme">
             
-            <!-- Deep link agar aplikasi bisa dibuka kembali setelah login -->
-            <intent-filter android:label="flutter_web_auth">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="com.example.simi"
-                    android:host="callback" />
-            </intent-filter>
-
-            <!-- Intent biasa untuk meluncurkan aplikasi -->
+            <!-- Intent untuk meluncurkan aplikasi -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -34,16 +26,12 @@
         </activity>
 
         <!-- Aktivitas untuk handle WebAuth callback -->
-        <activity
-            android:name="com.linusu.flutter_web_auth.CallbackActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data
-                    android:scheme="com.example.simi"
-                    android:host="callback"/>
+        <activity android:name="com.linusu.flutter_web_auth.CallbackActivity" android:exported="true">
+            <intent-filter android:label="flutter_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.example.simi" android:host="callback" />
             </intent-filter>
         </activity>
 
@@ -60,5 +48,4 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
-
 </manifest>
