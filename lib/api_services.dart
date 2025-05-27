@@ -465,15 +465,13 @@ class ApiService {
   }) async {
     try {
       final token = await AuthMiddleware
-          .getToken(); // Ambil token dari storage atau mana pun
-
+          .getToken();
       var request = http.MultipartRequest(
           'POST', Uri.parse('$baseUrl/api/auth/payments'));
 
-      // Tambahkan header Authorization
       request.headers['Authorization'] = 'Bearer $token';
       request.headers['Accept'] =
-          'application/json'; // opsional tapi disarankan
+          'application/json'; 
 
       request.fields['training_registration_id'] =
           trainingRegistrationId.toString();

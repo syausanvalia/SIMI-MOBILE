@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:simi/payment_status_manager.dart';
 import 'api_services.dart';
 import 'dashboard.dart';
 import 'berita.dart';
@@ -259,9 +260,19 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
     );
 
     if (result['success'] == true) {
+      await PaymentStatusManager.setPaymentStatus(widget.trainingId, true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(result['message'] ?? 'pembayaran berhasil dikirim')),
+      );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => CustomNavBarPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(result['message'] ?? 'gagal mengisi pembayaran')),
       );
     }
   }
