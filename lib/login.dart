@@ -30,7 +30,6 @@ class _LoginPageState extends State<LoginPage> {
     _checkAuthentication();
   }
 
-  // Cek apakah user sudah login
   void _checkAuthentication() async {
     if (await AuthMiddleware.isAuthenticated()) {
       Navigator.pushReplacementNamed(context, '/dashboard');

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:simi/api_services.dart';
-import 'package:simi/payment.dart';
 import 'package:simi/training_cart_page.dart';
 
 // Format angka ke Rupiah
@@ -21,19 +20,38 @@ class DaftarKelasPage extends StatefulWidget {
 class _DaftarKelasPageState extends State<DaftarKelasPage> {
   List<Map<String, dynamic>> allTrainings = [];
   bool isLoading = true;
+  bool alreadyRegistered = false;
 
   @override
   void initState() {
     super.initState();
-    fetchAllTrainings();
+    fetchInitialData();
+  }
+
+  Future<void> fetchInitialData() async {
+    await fetchAllTrainings();
+    await checkIfAlreadyRegistered();
   }
 
   Future<void> fetchAllTrainings() async {
-    final trainings = await ApiService.getTrainings(); // Panggil API langsung ke endpoint trainings
+    final trainings = await ApiService.getTrainings(); // Ambil semua data pelatihan
     setState(() {
       allTrainings = trainings;
-      isLoading = false;
     });
+  }
+
+  Future<void> checkIfAlreadyRegistered() async {
+    final result = await ApiService.getTrainingRegistrations();
+    if (result['success']) {
+      setState(() {
+        alreadyRegistered = (result['data'] as List).isNotEmpty;
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -103,41 +121,44 @@ class _DaftarKelasPageState extends State<DaftarKelasPage> {
                         const SizedBox(height: 20),
                         Center(
                           child: ElevatedButton(
-                          onPressed: () async {
-                          final result = await ApiService.postTrainingRegistration(training['id']);
-                          if (result['success']) {
-                           ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Berhasil mendaftar pelatihan!')),
-                            );
-                           Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                          builder: (context) => TrainingCartPage(), // halaman setelah daftar
-                            ),
-                          );
-                        } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(result['message'] ?? 'Pendaftaran gagal')),
-                             );
-                                }
-                                },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
-                              backgroundColor: Colors.pink[100],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              elevation: 4,
-                            ),
-                            child: const Text(
-                              'Checkout',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
+  onPressed: alreadyRegistered
+      ? null
+      : () async {
+          final result = await ApiService.postTrainingRegistration(training['id']);
+          if (result['success']) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Berhasil mendaftar pelatihan!')),
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TrainingCartPage(),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(result['message'] ?? 'Pendaftaran gagal')),
+            );
+          }
+        },
+          style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+          backgroundColor: alreadyRegistered ? Colors.grey : Colors.pink[100],
+          shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+          ),
+            elevation: 4,
+          ),
+          child: Text(
+          alreadyRegistered ? 'Sudah Terdaftar' : 'Checkout',
+          style: const TextStyle(
+          color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                ),
+                    ),
+                      ),
+
                         ),
                       ],
                     ),

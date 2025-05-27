@@ -9,6 +9,10 @@ import 'dashboard.dart';
 import 'berita.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'infoPekerjaan.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
+
 
 class konfirmasiPayment extends StatefulWidget {
   final int trainingId;
@@ -109,15 +113,43 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
   }
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _buktiTransfer = File(pickedFile.path);
-      });
-    }
+  final picker = ImagePicker();
+  final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile == null) {
+    print("Gambar tidak dipilih.");
+    return;
   }
+
+  final File originalFile = File(pickedFile.path);
+  final double originalSizeMB = (await originalFile.length()) / (1024 * 1024);
+
+  print('Path asli: ${originalFile.path}');
+  print('Ukuran asli: ${originalSizeMB.toStringAsFixed(2)} MB');
+
+  if (originalSizeMB > 2.0) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Ukuran Gambar Terlalu Besar'),
+        content: Text(
+            'Ukuran bukti transfer lebih dari 2MB (${originalSizeMB.toStringAsFixed(2)} MB). '
+            'Silakan unggah gambar dengan ukuran lebih kecil.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          )
+        ],
+      ),
+    );
+  }
+
+  setState(() {
+    _buktiTransfer = originalFile;
+  });
+}
+
 
   @override
   void dispose() {
@@ -209,36 +241,14 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
       ),
     );
   }
+  
 
-  Future<void> _submitPayment() async {
-    if (_kodeInvoiceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kode Invoice wajib diisi')),
-      );
-      return;
-    }
-    if (_selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tanggal transfer wajib dipilih')),
-      );
-      return;
-    }
-    if (_selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Waktu transfer wajib dipilih')),
-      );
-      return;
-    }
-    if (_buktiTransfer == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bukti transfer wajib diunggah')),
-      );
-      return;
-    }
+ Future<void> _submitPayment() async {
+    if (!_validateInputs()) return;
 
-    // Gunakan fungsi helper format 24 jam
+    // Format waktu dengan benar
     final transferTime = formatTimeOfDay24(_selectedTime!);
-
+    
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -253,26 +263,57 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
       proofOfTransfer: _buktiTransfer!,
     );
 
-    Navigator.of(context).pop();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['message'] ?? 'Tidak ada pesan')),
-    );
+    Navigator.of(context).pop(); // tutup loading dialog
 
     if (result['success'] == true) {
       await PaymentStatusManager.setPaymentStatus(widget.trainingId, true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(result['message'] ?? 'pembayaran berhasil dikirim')),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => CustomNavBarPage()),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const CustomNavBarPage()),
+        );
+      }
     } else {
+      if (mounted) {
+        // Tampilkan detail error jika ada
+        String errorMessage = result['message'];
+        if (result['errors'] != null) {
+          errorMessage += '\n${result['errors'].toString()}';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    }
+  }
+
+  bool _validateInputs() {
+    if (_kodeInvoiceController.text.isEmpty) {
+      _showError('Kode Invoice wajib diisi');
+      return false;
+    }
+    if (_selectedDate == null) {
+      _showError('Tanggal transfer wajib dipilih');
+      return false;
+    }
+    if (_selectedTime == null) {
+      _showError('Waktu transfer wajib dipilih');
+      return false;
+    }
+    if (_buktiTransfer == null) {
+      _showError('Bukti transfer wajib diunggah');
+      return false;
+    }
+    return true;
+  }
+
+  void _showError(String message) {
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(result['message'] ?? 'gagal mengisi pembayaran')),
+        SnackBar(content: Text(message)),
       );
     }
   }

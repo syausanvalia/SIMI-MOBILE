@@ -105,7 +105,6 @@ class TrainingDetailPage extends StatelessWidget {
                      ),
                     );
                   },
-
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
                           backgroundColor: Colors.pink[100],

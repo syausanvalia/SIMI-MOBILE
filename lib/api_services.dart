@@ -6,6 +6,7 @@ import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'auth_middleware.dart';
 import 'dart:io';
+import 'package:intl/intl.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -49,23 +50,22 @@ class ApiService {
   static Future<Map<String, dynamic>> loginWithGoogle() async {
     try {
       final callbackUrlScheme = 'com.example.simi';
-      // Gunakan URL lengkap termasuk protocol dan domain
       final authUrl = '$baseUrl/api/auth/google?platform=mobile';
 
-      print('Starting Google Auth with URL: $authUrl'); // Debug log
+      print('Starting Google Auth with URL: $authUrl');
 
       final result = await FlutterWebAuth.authenticate(
         url: authUrl,
         callbackUrlScheme: callbackUrlScheme,
       );
 
-      print('Auth Result: $result'); // Debug log
+      print('Auth Result: $result'); 
 
       final uri = Uri.parse(result);
       final encodedData = uri.queryParameters['data'];
 
       if (encodedData == null) {
-        print('No encoded data found in callback'); // Debug log
+        print('No encoded data found in callback'); 
         return {
           'success': false,
           'message': 'Data tidak ditemukan dari callback URL.',
@@ -73,7 +73,7 @@ class ApiService {
       }
 
       final decodedJson = json.decode(utf8.decode(base64.decode(encodedData)));
-      print('Decoded JSON: $decodedJson'); // Debug log
+      print('Decoded JSON: $decodedJson'); 
 
       final token = decodedJson['token'];
       final status = decodedJson['status'] ?? false;
@@ -92,7 +92,7 @@ class ApiService {
         };
       }
     } catch (e) {
-      print('Google login error: $e'); // Debug log
+      print('Google login error: $e'); 
       return {
         'success': false,
         'message': 'Kesalahan saat login Google: $e',
@@ -462,32 +462,51 @@ class ApiService {
     required DateTime transferDate,
     required String transferTime,
     required File proofOfTransfer,
+
+   
   }) async {
+    
     try {
-      final token = await AuthMiddleware
-          .getToken();
+      final token = await AuthMiddleware.getToken();
       var request = http.MultipartRequest(
           'POST', Uri.parse('$baseUrl/api/auth/payments'));
 
       request.headers['Authorization'] = 'Bearer $token';
-      request.headers['Accept'] =
-          'application/json'; 
+      request.headers['Accept'] = 'application/json';
 
-      request.fields['training_registration_id'] =
-          trainingRegistrationId.toString();
-      request.fields['invoice_code'] = invoiceCode;
-      request.fields['transfer_date'] =
-          transferDate.toIso8601String().split('T')[0];
-      request.fields['transfer_time'] = transferTime;
+      String formattedDate = DateFormat('yyyy-MM-dd').format(transferDate);
 
-      request.files.add(await http.MultipartFile.fromPath(
+      request.fields.addAll({
+        'training_registration_id': trainingRegistrationId.toString(),
+        'invoice_code': invoiceCode,
+        'transfer_date': formattedDate,
+        'transfer_time': transferTime,
+      });
+
+      // Log sebelum mengirim request
+      print('Sending fields:');
+      request.fields.forEach((key, value) {
+        print('$key: $value');
+      });
+
+      // Tambahkan file
+      var fileStream = http.ByteStream(proofOfTransfer.openRead());
+      var length = await proofOfTransfer.length();
+      
+      var multipartFile = http.MultipartFile(
         'proof_of_transfer',
-        proofOfTransfer.path,
+        fileStream,
+        length,
         filename: proofOfTransfer.path.split('/').last,
-      ));
+      );
+      
+      request.files.add(multipartFile);
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
@@ -499,11 +518,47 @@ class ApiService {
         final jsonResponse = jsonDecode(response.body);
         return {
           'success': false,
-          'message': jsonResponse['message'] ?? 'Gagal mengirim pembayaran'
+          'message': jsonResponse['message'] ?? 'Gagal mengirim pembayaran',
+          'errors': jsonResponse['errors'] // tambahkan ini untuk melihat detail error
         };
       }
     } catch (e) {
+      print('Error exception: $e');
       return {'success': false, 'message': 'Terjadi kesalahan: $e'};
     }
   }
+  
+static Future<Map<String, dynamic>> cancelTrainingRegistration(int id) async {
+  try {
+    final token = await AuthMiddleware.getToken();
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/api/auth/training-registrations/$id/cancel'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data['status'] == true) {
+      return {
+        'success': true,
+        'message': data['message'],
+      };
+    } else {
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Pembatalan gagal',
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Terjadi kesalahan: $e',
+    };
+  }
+}
+
 }
