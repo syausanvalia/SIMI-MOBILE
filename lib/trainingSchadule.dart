@@ -3,6 +3,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'berita.dart';
 import 'dashboard.dart';
 import 'infoPekerjaan.dart';
+import 'api_services.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -10,6 +11,7 @@ void main() {
     debugShowCheckedModeBanner: false,
   ));
 }
+ 
 
 class TrainingSchedulePage extends StatefulWidget {
   const TrainingSchedulePage({super.key});
@@ -20,22 +22,25 @@ class TrainingSchedulePage extends StatefulWidget {
 
 class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
   int currentIndex = 1;
-  List<Map<String, String>> trainingScheduleList = [
-    {
-      'ID': '1',
-      'Materi': '',
-      'Lokasi': '',
-      'Hari': '',
-      'Jam': '',
-    },
-    {
-      'ID': '2',
-      'Materi': '',
-      'Lokasi': '',
-      'Hari': '',
-      'Jam': '',
-    },
-  ];
+  List<Map<String, String>> trainingScheduleList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadTrainingSchedule();
+  }
+
+  Future<void> loadTrainingSchedule() async {
+    try {
+      final data = await ApiService.fetchTrainingSchedule(); // Ganti YourApiService sesuai file/fungsi kamu
+      setState(() {
+        trainingScheduleList = data;
+      });
+    } catch (e) {
+      // Optional: Tampilkan error atau dialog
+      print('Failed to fetch training schedule: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,27 +78,34 @@ class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    headingRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
-                    dataRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
-                    border: TableBorder.all(color: Colors.black, width: 0.5),
-                    columns: const [
-                      DataColumn(label: Text('ID')),
-                      DataColumn(label: Text('Materi')),
-                      DataColumn(label: Text('Lokasi')),
-                      DataColumn(label: Text('Hari')),
-                      DataColumn(label: Text('Jam')),
-                    ],
-                    rows: trainingScheduleList.map((data) {
-                      return DataRow(cells: [
-                        DataCell(Text(data['ID'] ?? 'N/A')), 
-                        DataCell(Text(data['Materi'] ?? 'N/A')), 
-                        DataCell(Text(data['Lokasi'] ?? 'N/A')), 
-                        DataCell(Text(data['Hari'] ?? 'N/A')), 
-                        DataCell(Text(data['Jam'] ?? 'N/A')), 
-                      ]);
-                    }).toList(),
-                  ),
+                  child: trainingScheduleList.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : DataTable(
+                          headingRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                          dataRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                          border: TableBorder.all(color: Colors.black, width: 0.5),
+                          columns: const [
+                          DataColumn(label: Text('Materi')),
+                          DataColumn(label: Text('Lokasi')),
+                          DataColumn(label: Text('Hari')),
+                          DataColumn(label: Text('Jam')),
+                          DataColumn(label: Text('Durasi')),
+                          DataColumn(label: Text('Mulai')),
+                          DataColumn(label: Text('Selesai')),
+                            ],
+                          rows: trainingScheduleList.map((data) {
+                          return DataRow(cells: [
+                          DataCell(Text(data['Materi'] ?? 'N/A')),
+                          DataCell(Text(data['Lokasi'] ?? 'N/A')),
+                          DataCell(Text(data['Hari'] ?? 'N/A')),
+                          DataCell(Text(data['Jam'] ?? 'N/A')),
+                          DataCell(Text(data['Durasi'] ?? 'N/A')),
+                          DataCell(Text(data['Mulai'] ?? 'N/A')),
+                          DataCell(Text(data['Selesai'] ?? 'N/A')),
+                          ]);
+                          }).toList(),
+
+                        ),
                 ),
               ),
             ),

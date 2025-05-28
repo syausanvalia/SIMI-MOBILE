@@ -560,5 +560,50 @@ static Future<Map<String, dynamic>> cancelTrainingRegistration(int id) async {
     };
   }
 }
+ static Future<List<Map<String, String>>> fetchTrainingSchedule() async {
+  try {
+    final token = await AuthMiddleware.getToken();
+    final url = Uri.parse('$baseUrl/api/auth/user/training-schedules');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      final List<Map<String, String>> result = [];
+
+      for (var item in data['data']) {
+        final training = item['training'];
+        final schedules = training['schedules'] as List;
+
+        for (var schedule in schedules) {
+          result.add({
+            'ID': item['id'].toString(),
+            'Materi': schedule['training_material'] ?? '',
+            'Lokasi': schedule['location'] ?? '',
+            'Hari': schedule['day'] ?? '',
+            'Jam': schedule['time'] ?? '',
+            'Durasi': schedule['duration'].toString(),
+            'Mulai': schedule['start_date'] ?? '',
+            'Selesai': schedule['end_date'] ?? '',
+          });
+        }
+      }
+
+      return result;
+    } else {
+      throw Exception('Failed to load training schedule. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error fetching training schedule: $e');
+  }
+}
+
 
 }
