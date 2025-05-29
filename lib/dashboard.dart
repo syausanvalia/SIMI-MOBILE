@@ -12,6 +12,7 @@ import 'infoPekerjaan.dart';
 import 'final_score.dart';
 import 'infoBerangkat.dart';
 import 'daftar_kelas_page.dart';
+import 'personaldata.dart';
 import 'package:simi/training_cart_page.dart';
 
 void main() {
@@ -156,8 +157,10 @@ class _DashboardState extends State<Dashboard> {
                 shrinkWrap: true,
                 children: [
                   _buildMenuItem(Icons.account_box, "personal data", () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => PersonalDataPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => PersonalDataScreen()));
                   }),
                   _buildMenuItem(Icons.assignment_turned_in, "complete data",
                       () {
@@ -182,7 +185,6 @@ class _DashboardState extends State<Dashboard> {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => FinalScorePage()));
                   }),
-                  // Menu tambahan: DAFTAR KELAS
                   _buildMenuItem(Icons.class_, "daftar kelas", () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => DaftarKelasPage()));
