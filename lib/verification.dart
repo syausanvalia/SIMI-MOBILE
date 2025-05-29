@@ -48,7 +48,6 @@ class _VerificationPageState extends State<VerificationPage> {
       final result = await ApiService.verifyOtp(widget.email, otp);
 
       if (result['success']) {
-        // Update cara navigate ke ResetPasswordPage
         Navigator.push(
           context,
           MaterialPageRoute(

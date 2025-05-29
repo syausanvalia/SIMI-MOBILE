@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/foundation.dart'; // Untuk kIsWeb
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -605,5 +606,30 @@ static Future<Map<String, dynamic>> cancelTrainingRegistration(int id) async {
   }
 }
 
+static Future<List<Map<String, dynamic>>> fetchExamScores() async {
+  try {
+    final token = await AuthMiddleware.getToken();
+    final url = Uri.parse('$baseUrl/api/auth/exam-scores');
 
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == true && data['data'] != null) {
+        return List<Map<String, dynamic>>.from(data['data']);
+      }
+      return [];
+    } else {
+      throw Exception('Failed to load exam scores. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error fetching exam scores: $e');
+  }
+}
 }
