@@ -123,6 +123,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios_new),
@@ -131,6 +132,12 @@ class _FinalScorePageState extends State<FinalScorePage> {
                         context,
                         MaterialPageRoute(builder: (_) => const CustomNavBarPage()),
                       );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () {
+                      fetchScores(); // refresh nilai
                     },
                   ),
                 ],
@@ -156,10 +163,14 @@ class _FinalScorePageState extends State<FinalScorePage> {
               const Center(child: Text('Tidak ada data nilai'))
             else
               Expanded(
-                child: ListView.builder(
-                  itemCount: examScores.length,
-                  itemBuilder: (context, index) =>
-                      buildScoreCard(examScores[index], index),
+                child: RefreshIndicator(
+                  onRefresh: fetchScores,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: examScores.length,
+                    itemBuilder: (context, index) =>
+                        buildScoreCard(examScores[index], index),
+                  ),
                 ),
               ),
           ],

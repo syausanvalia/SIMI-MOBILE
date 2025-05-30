@@ -39,6 +39,11 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
   }
 
   Future<void> loadExamScores() async {
+    setState(() {
+      isLoading = true;
+      showCongrats = false;
+    });
+
     try {
       final data = await ApiService.fetchExamScores();
       final approvedData = data.where((e) => e['review_status'] == 'approved').toList();
@@ -192,6 +197,14 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.pinkAccent),
+            onPressed: () {
+              loadExamScores(); // <-- Fitur refresh
+            },
+          )
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

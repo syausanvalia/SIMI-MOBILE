@@ -41,6 +41,7 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
         setState(() {
           registrations = registrationsData;
           isLoading = false;
+          hasError = false;
         });
       } else {
         throw Exception(response['message'] ?? 'Gagal mengambil data.');
@@ -215,14 +216,23 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
           ? Center(child: CircularProgressIndicator())
           : hasError
               ? Center(child: Text("Gagal memuat data."))
-              : registrations.isEmpty
-                  ? Center(child: Text("Tidak ada pelatihan dalam keranjang."))
-                  : ListView.builder(
-                      itemCount: registrations.length,
-                      itemBuilder: (context, index) {
-                        return _buildCartItem(registrations[index]);
-                      },
-                    ),
+              : RefreshIndicator(
+                  onRefresh: fetchRegistrations,
+                  child: registrations.isEmpty
+                      ? ListView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(height: 100),
+                            Center(child: Text("Tidak ada pelatihan dalam keranjang.")),
+                          ],
+                        )
+                      : ListView.builder(
+                          itemCount: registrations.length,
+                          itemBuilder: (context, index) {
+                            return _buildCartItem(registrations[index]);
+                          },
+                        ),
+                ),
     );
   }
 }

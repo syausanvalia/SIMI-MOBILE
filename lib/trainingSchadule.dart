@@ -11,7 +11,6 @@ void main() {
     debugShowCheckedModeBanner: false,
   ));
 }
- 
 
 class TrainingSchedulePage extends StatefulWidget {
   const TrainingSchedulePage({super.key});
@@ -23,6 +22,7 @@ class TrainingSchedulePage extends StatefulWidget {
 class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
   int currentIndex = 1;
   List<Map<String, String>> trainingScheduleList = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -31,14 +31,21 @@ class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
   }
 
   Future<void> loadTrainingSchedule() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final data = await ApiService.fetchTrainingSchedule(); // Ganti YourApiService sesuai file/fungsi kamu
       setState(() {
         trainingScheduleList = data;
       });
     } catch (e) {
-      // Optional: Tampilkan error atau dialog
       print('Failed to fetch training schedule: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -74,39 +81,42 @@ class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
             const SizedBox(height: 16),
 
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: trainingScheduleList.isEmpty
-                      ? const Center(child: CircularProgressIndicator())
-                      : DataTable(
-                          headingRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
-                          dataRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
-                          border: TableBorder.all(color: Colors.black, width: 0.5),
-                          columns: const [
-                          DataColumn(label: Text('Materi')),
-                          DataColumn(label: Text('Lokasi')),
-                          DataColumn(label: Text('Hari')),
-                          DataColumn(label: Text('Jam')),
-                          DataColumn(label: Text('Durasi')),
-                          DataColumn(label: Text('Mulai')),
-                          DataColumn(label: Text('Selesai')),
+              child: RefreshIndicator(
+                onRefresh: loadTrainingSchedule,
+                child: trainingScheduleList.isEmpty && isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            headingRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                            dataRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
+                            border: TableBorder.all(color: Colors.black, width: 0.5),
+                            columns: const [
+                              DataColumn(label: Text('Materi')),
+                              DataColumn(label: Text('Lokasi')),
+                              DataColumn(label: Text('Hari')),
+                              DataColumn(label: Text('Jam')),
+                              DataColumn(label: Text('Durasi')),
+                              DataColumn(label: Text('Mulai')),
+                              DataColumn(label: Text('Selesai')),
                             ],
-                          rows: trainingScheduleList.map((data) {
-                          return DataRow(cells: [
-                          DataCell(Text(data['Materi'] ?? 'N/A')),
-                          DataCell(Text(data['Lokasi'] ?? 'N/A')),
-                          DataCell(Text(data['Hari'] ?? 'N/A')),
-                          DataCell(Text(data['Jam'] ?? 'N/A')),
-                          DataCell(Text(data['Durasi'] ?? 'N/A')),
-                          DataCell(Text(data['Mulai'] ?? 'N/A')),
-                          DataCell(Text(data['Selesai'] ?? 'N/A')),
-                          ]);
-                          }).toList(),
-
+                            rows: trainingScheduleList.map((data) {
+                              return DataRow(cells: [
+                                DataCell(Text(data['Materi'] ?? 'N/A')),
+                                DataCell(Text(data['Lokasi'] ?? 'N/A')),
+                                DataCell(Text(data['Hari'] ?? 'N/A')),
+                                DataCell(Text(data['Jam'] ?? 'N/A')),
+                                DataCell(Text(data['Durasi'] ?? 'N/A')),
+                                DataCell(Text(data['Mulai'] ?? 'N/A')),
+                                DataCell(Text(data['Selesai'] ?? 'N/A')),
+                              ]);
+                            }).toList(),
+                          ),
                         ),
-                ),
+                      ),
               ),
             ),
           ],
@@ -134,7 +144,7 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
     _currentIndex = widget.initialIndex;
   }
 
- Widget _getPageByIndex(int index) {
+  Widget _getPageByIndex(int index) {
     switch (index) {
       case 0:
         return JobInfoPage();

@@ -7,7 +7,6 @@ import 'package:simi/api_services.dart'; // pastikan file ini ada
 import 'package:simi/auth_middleware.dart';
 import 'package:intl/intl.dart';
 
-
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -33,6 +32,9 @@ class _JobInfoPageState extends State<JobInfoPage> {
   }
 
   Future<void> fetchJobs() async {
+    setState(() {
+      isLoading = true;
+    });
     final jobs = await ApiService.getJobs();
     setState(() {
       jobList = jobs;
@@ -59,100 +61,102 @@ class _JobInfoPageState extends State<JobInfoPage> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              itemCount: jobList.length,
-              itemBuilder: (context, index) {
-                final job = jobList[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                       builder: (context) => TrainingDetailPage(training: job),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 16),
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 6,
-                          offset: Offset(0, 3),
+          : RefreshIndicator(
+              onRefresh: fetchJobs,
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                itemCount: jobList.length,
+                itemBuilder: (context, index) {
+                  final job = jobList[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrainingDetailPage(training: job),
                         ),
-                      ],
+                      );
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 16),
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            job['training']?['training_name'] ?? '',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            job['job_title'] ?? '',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            job['negara'] ?? '',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          RichText(
+                            text: TextSpan(
+                              text: NumberFormat.currency(
+                                locale: 'id_ID',
+                                symbol: 'Rp ',
+                                decimalDigits: 0,
+                              ).format(double.tryParse(job['salary'] ?? '0') ?? 0),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: " /bulan",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 12,
+                                    color: Colors.grey[700],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            job['deskripsi'] ?? '',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          job['training']?['training_name'] ?? '',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          job['job_title'] ?? '',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          job['negara'] ?? '',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        RichText(
-                        text: TextSpan(
-                      text: NumberFormat.currency(
-                      locale: 'id_ID',
-                      symbol: 'Rp ',
-                      decimalDigits: 0,
-                     ).format(double.tryParse(job['salary'] ?? '0') ?? 0),
-                      style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black,
-                      ),
-                    children: [
-                  TextSpan(
-                  text: " /bulan",
-                    style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 12,
-                    color: Colors.grey[700],
-                      ),
-                    )
-                    ],
-                  ),
-                ),
- 
-                        SizedBox(height: 8),
-                        Text(
-                          job['deskripsi'] ?? '',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
     );
   }

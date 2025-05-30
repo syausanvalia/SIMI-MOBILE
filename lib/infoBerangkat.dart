@@ -28,6 +28,10 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
   }
 
   Future<void> fetchTravelInfo() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final logs = await ApiService.getTravelLogs();
     setState(() {
       travelInfo = logs.isNotEmpty ? logs[0] : null;
@@ -83,18 +87,22 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
                         ),
                       ),
                       Expanded(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 12),
-                              buildDataField("Nama :", travelInfo!['nama_user']?? '-'),
-                              buildDataField("Review Status", travelInfo!['review_status'] ?? '-'),
-                              buildDataField("Travel Type", travelInfo!['travel_type'] ?? '-'),
-                              buildDataField("Date", travelInfo!['date'] ?? '-'),
-                              const SizedBox(height: 24),
-                            ],
+                        child: RefreshIndicator(
+                          onRefresh: fetchTravelInfo,
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 12),
+                                buildDataField("Nama :", travelInfo!['nama_user'] ?? '-'),
+                                buildDataField("Review Status", travelInfo!['review_status'] ?? '-'),
+                                buildDataField("Travel Type", travelInfo!['travel_type'] ?? '-'),
+                                buildDataField("Date", travelInfo!['date'] ?? '-'),
+                                const SizedBox(height: 24),
+                              ],
+                            ),
                           ),
                         ),
                       ),

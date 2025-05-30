@@ -39,22 +39,25 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> fetchDashboardData() async {
-    try {
-      final data = await ApiService.getDashboard();
-      print("RESPON DASHBOARD: $data");
-      setState(() {
-        welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
-        isLoading = false;
-      });
-    } catch (e) {
-      print("ERROR DASHBOARD: $e");
-      setState(() {
-        welcomeMessage = "Gagal memuat data";
-        hasError = true;
-        isLoading = false;
-      });
-    }
+  try {
+    final data = await ApiService.getDashboard();
+    print("RESPON DASHBOARD: $data");
+    if (!mounted) return; 
+    setState(() {
+      welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
+      isLoading = false;
+    });
+  } catch (e) {
+    print("ERROR DASHBOARD: $e");
+    if (!mounted) return;  
+    setState(() {
+      welcomeMessage = "Gagal memuat data";
+      hasError = true;
+      isLoading = false;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
