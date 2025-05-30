@@ -829,7 +829,6 @@ static Future<Map<String, dynamic>> submitUserDetails({
     request.headers['Authorization'] = 'Bearer $token';
     request.headers['Accept'] = 'application/json';
 
-    // Tambahkan field biasa
     userData.forEach((key, value) async {
       if (value is File) {
         final file = await http.MultipartFile.fromPath(key, value.path);
@@ -839,7 +838,6 @@ static Future<Map<String, dynamic>> submitUserDetails({
       }
     });
 
-    // Kirim request
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
     final data = jsonDecode(response.body);
@@ -860,6 +858,28 @@ static Future<Map<String, dynamic>> submitUserDetails({
       'success': false,
       'message': 'Terjadi kesalahan: $e',
     };
+  }
+}
+static Future<List<Map<String, dynamic>>> getTravelLogs() async {
+  try {
+    final token = await AuthMiddleware.getToken(); 
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/auth/travel-logs'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success']) {
+        return List<Map<String, dynamic>>.from(data['data']);
+      }
+    }
+    return [];
+  } catch (e) {
+    print('Error fetching travel logs: $e');
+    return [];
   }
 }
 

@@ -5,15 +5,6 @@ import 'package:simi/berita.dart';
 import 'package:simi/infoPekerjaan.dart';
 import 'dashboard.dart';
 
-
-
-void main() {
-  runApp(const MaterialApp(
-    home: FinalScorePage(),
-    debugShowCheckedModeBanner: false,
- ));
-}
-
 class FinalScorePage extends StatefulWidget {
   const FinalScorePage({super.key});
 
@@ -53,6 +44,74 @@ class _FinalScorePageState extends State<FinalScorePage> {
     }
   }
 
+  Widget buildScoreCard(Map<String, dynamic> score, int index) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: const Color(0xFFFFF0F5),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Table(
+          columnWidths: const {
+            0: IntrinsicColumnWidth(),
+            1: FlexColumnWidth(),
+          },
+          children: [
+            TableRow(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6),
+                  child: Text('No', style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Text(': ${index + 1}'),
+                ),
+              ],
+            ),
+            TableRow(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6),
+                  child: Text('Kelas', style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Text(': ${score['kelas_pelatihan'] ?? 'N/A'}'),
+                ),
+              ],
+            ),
+            TableRow(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6),
+                  child: Text('Nilai', style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Text(': ${score['nilai']?.toString() ?? 'N/A'}'),
+                ),
+              ],
+            ),
+            TableRow(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 6),
+                  child: Text('Keterangan', style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Text(': ${score['keterangan'] ?? 'N/A'}'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,16 +119,17 @@ class _FinalScorePageState extends State<FinalScorePage> {
       body: SafeArea(
         child: Column(
           children: [
+            // Top bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                    icon: const Icon(Icons.arrow_back_ios_new),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => CustomNavBarPage()),
+                        MaterialPageRoute(builder: (_) => const CustomNavBarPage()),
                       );
                     },
                   ),
@@ -85,44 +145,21 @@ class _FinalScorePageState extends State<FinalScorePage> {
                 color: Colors.pinkAccent,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
+            // Content
             if (isLoading)
               const Center(child: CircularProgressIndicator())
             else if (errorMessage.isNotEmpty)
-              Center(child: Text(errorMessage, style: TextStyle(color: Colors.red)))
+              Center(child: Text(errorMessage, style: const TextStyle(color: Colors.red)))
             else if (examScores.isEmpty)
               const Center(child: Text('Tidak ada data nilai'))
             else
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      headingRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
-                      dataRowColor: MaterialStateProperty.all(const Color(0xFFFFF0F5)),
-                      border: TableBorder.all(color: Colors.black, width: 0.5),
-                      columns: const [
-                        DataColumn(label: Text('No')),
-                        DataColumn(label: Text('Kelas')),
-                        DataColumn(label: Text('Nilai')),
-                        DataColumn(label: Text('Keterangan')),
-                        DataColumn(label: Text('Status')),
-                      ],
-                      rows: examScores.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final score = entry.value;
-                        return DataRow(cells: [
-                          DataCell(Text('${index + 1}')),
-                          DataCell(Text(score['kelas_pelatihan'] ?? 'N/A')),
-                          DataCell(Text(score['nilai']?.toString() ?? 'N/A')),
-                          DataCell(Text(score['keterangan'] ?? 'N/A')),
-                          DataCell(Text(score['review_status'] ?? 'N/A')),
-                        ]);
-                      }).toList(),
-                    ),
-                  ),
+                child: ListView.builder(
+                  itemCount: examScores.length,
+                  itemBuilder: (context, index) =>
+                      buildScoreCard(examScores[index], index),
                 ),
               ),
           ],
@@ -131,7 +168,8 @@ class _FinalScorePageState extends State<FinalScorePage> {
     );
   }
 }
-  class CustomNavBarPage extends StatefulWidget {
+
+class CustomNavBarPage extends StatefulWidget {
   final int initialIndex;
   const CustomNavBarPage({Key? key, this.initialIndex = 1}) : super(key: key);
 
@@ -162,7 +200,6 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
     }
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[

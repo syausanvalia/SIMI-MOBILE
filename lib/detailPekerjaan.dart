@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:simi/daftar_kelas_page.dart';
 import 'package:simi/payment.dart';
 import 'package:simi/infoPekerjaan.dart';
+import 'daftar_kelas_page.dart';
 
 // Fungsi untuk format Rupiah
 String formatRupiah(dynamic number) {
   if (number == null) return 'Rp0';
-  final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
+  final formatter =
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   return formatter.format(number);
 }
 
 class TrainingDetailPage extends StatelessWidget {
   final Map<String, dynamic> training;
 
-  const TrainingDetailPage({Key? key, required this.training}) : super(key: key);
+  const TrainingDetailPage({Key? key, required this.training})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +54,8 @@ class TrainingDetailPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                       training['training']?['training_name'] ?? 'Nama Pelatihan',
+                      training['training']?['training_name'] ??
+                          'Nama Pelatihan',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -80,13 +85,13 @@ class TrainingDetailPage extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     Text(
-                  training['training']?['description'] ?? '-',
-                  style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[800],
-                  height: 1.5,
-                  ),
-                ),
+                      training['training']?['description'] ?? '-',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[800],
+                        height: 1.5,
+                      ),
+                    ),
 
                     const SizedBox(height: 24),
 
@@ -94,19 +99,18 @@ class TrainingDetailPage extends StatelessWidget {
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                   builder: (context) => PaymentPage(
-                   id: training['training']?['id'],
-                   trainingName: training['training']?['training_name'],
-                    price: training['training']?['price'],
-                        ),
-                     ),
-                    );
-                  },
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DaftarKelasPage(
+                           
+                              ),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 14),
                           backgroundColor: Colors.pink[100],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
