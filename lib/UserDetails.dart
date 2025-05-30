@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'custom_navbar.dart';
+import 'api_services.dart';
 
 class UserDetailsScreen extends StatefulWidget {
   @override
@@ -8,10 +9,83 @@ class UserDetailsScreen extends StatefulWidget {
 
 class _UserDetailsScreenState extends State<UserDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _agencyNameController = TextEditingController();
-  TextEditingController _positionController = TextEditingController();
-  TextEditingController _visaTetoController = TextEditingController();
-  TextEditingController _sponsorController = TextEditingController();
+  final TextEditingController _agencyNameController = TextEditingController();
+  final TextEditingController _positionController = TextEditingController();
+  final TextEditingController _visaTetoController = TextEditingController();
+  final TextEditingController _sponsorController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _agencyNameController.dispose();
+    _positionController.dispose();
+    _visaTetoController.dispose();
+    _sponsorController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitUserDetails() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await ApiService.submitUserDetails(
+        agencyName: _agencyNameController.text.trim(),
+        position: _positionController.text.trim(),
+        visaTeto: _visaTetoController.text.trim(),
+        sponsor: _sponsorController.text.trim(),
+      );
+
+      if (response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Data submitted successfully')),
+        );
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => CustomNavBarPage()),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Submission failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        validator: (value) =>
+            value == null || value.isEmpty ? 'Please enter $label' : null,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +103,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           ),
         ),
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -39,77 +113,36 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                 _buildTextField(_positionController, 'Position'),
                 _buildTextField(_visaTetoController, 'Visa Teto'),
                 _buildTextField(_sponsorController, 'Sponsor'),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.arrow_back),
-                          SizedBox(width: 8),
-                          Text('Previous'),
-                        ],
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 250, 195, 213),
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CustomNavBarPage(),
-                            ),
-                            (route) => false,
-                          );
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Text('Finish'),
-                          SizedBox(width: 8),
-                          Icon(Icons.check),
-                        ],
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 250, 195, 213),
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _submitUserDetails,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 250, 195, 213),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text('Finish'),
+                            SizedBox(width: 8),
+                            Icon(Icons.check),
+                          ],
+                        ),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter $label';
-          }
-          return null;
-        },
       ),
     );
   }

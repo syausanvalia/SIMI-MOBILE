@@ -9,6 +9,7 @@ import 'auth_middleware.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
 
+
 class ApiService {
   static const String baseUrl =
       'https://saddlebrown-louse-528508.hostingersite.com';
@@ -520,7 +521,7 @@ class ApiService {
         return {
           'success': false,
           'message': jsonResponse['message'] ?? 'Gagal mengirim pembayaran',
-          'errors': jsonResponse['errors'] // tambahkan ini untuk melihat detail error
+          'errors': jsonResponse['errors'] 
         };
       }
     } catch (e) {
@@ -632,4 +633,234 @@ static Future<List<Map<String, dynamic>>> fetchExamScores() async {
     throw Exception('Error fetching exam scores: $e');
   }
 }
+
+static Future<Map<String, dynamic>> postPersonalData({
+  required String idCardNumber,
+  required String citizenId,
+  required String passportNumber,
+  required String familyCardNumber,
+  required String birthPlace,
+  required String birthDate,
+  required String diplomaNumber,
+  required String preMedicalCheckup,
+  required String fullMedicalCheckup,
+}) async {
+  try {
+    final token = await AuthMiddleware.getToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/auth/personal-data'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'id_card_number': idCardNumber,
+        'citizen_id': citizenId,
+        'passport_number': passportNumber,
+        'family_card_number': familyCardNumber,
+        'birth_place': birthPlace,
+        'birth_date': birthDate,
+        'diploma_number': diplomaNumber,
+        'pre_medical_checkup': preMedicalCheckup,
+        'full_medical_checkup': fullMedicalCheckup,
+      }),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 201) {
+      return {
+        'success': true,
+        'message': data['message'],
+        'data': data['data'],
+      };
+    } else {
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Failed to save personal data',
+        'errors': data['errors'],
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Error occurred: $e',
+    };
+  }
+}
+
+static Future<Map<String, dynamic>> uploadUserDocuments({
+  required Map<String, String> documents,
+}) async {
+  try {
+    final token = await AuthMiddleware.getToken();
+    
+    var uri = Uri.parse('$baseUrl/api/auth/user-documents');
+    var request = http.MultipartRequest('POST', uri);
+  
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    });
+    for (var entry in documents.entries) {
+      var file = File(entry.value);
+      var stream = http.ByteStream(file.openRead());
+      var length = await file.length();
+      
+      var multipartFile = http.MultipartFile(
+        entry.key,
+        stream,
+        length,
+        filename: entry.value.split('/').last,
+      );
+      
+      request.files.add(multipartFile);
+    }
+
+    var response = await request.send();
+    var responseData = await response.stream.bytesToString();
+    var data = jsonDecode(responseData);
+
+    if (response.statusCode == 201) {
+      return {
+        'success': true,
+        'message': data['message'],
+        'data': data['data'],
+      };
+    } else {
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Failed to upload documents',
+        'errors': data['errors'],
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Error occurred: $e',
+    };
+  }
+}
+
+static Future<Map<String, dynamic>> submitUserDetails({
+  required String agencyName,
+  required String position,
+  required String visaTeto,
+  required String sponsor,
+}) async {
+  try {
+    final token = await AuthMiddleware.getToken();
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/auth/user-details'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'agency_name': agencyName,
+        'position': position,
+        'visa_teto': visaTeto,
+        'sponsor': sponsor,
+      }),
+    );
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 201) {
+      return {
+        'success': true,
+        'message': data['message'],
+        'data': data['data'],
+      };
+    } else {
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Submission failed',
+        'errors': data['errors'] ?? {},
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Error occurred: $e',
+    };
+  }
+}
+  static Future<Map<String, dynamic>> getUserProfile() async {
+    try {
+      final token = await AuthMiddleware.getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/auth/user-profile'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': data['data'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to fetch data',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error occurred: $e',
+      };
+    }
+  }
+   static Future<Map<String, dynamic>> updateUserProfile(Map<String, dynamic> userData) async {
+  try {
+    final token = await AuthMiddleware.getToken();
+    final uri = Uri.parse('$baseUrl/api/auth/user-profile');
+
+    final request = http.MultipartRequest('POST', uri);
+    request.headers['Authorization'] = 'Bearer $token';
+    request.headers['Accept'] = 'application/json';
+
+    // Tambahkan field biasa
+    userData.forEach((key, value) async {
+      if (value is File) {
+        final file = await http.MultipartFile.fromPath(key, value.path);
+        request.files.add(file);
+      } else {
+        request.fields[key] = value.toString();
+      }
+    });
+
+    // Kirim request
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return {
+        'success': true,
+        'message': data['message'] ?? 'Profil berhasil diperbarui',
+      };
+    } else {
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Gagal memperbarui profil',
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Terjadi kesalahan: $e',
+    };
+  }
+}
+
 }

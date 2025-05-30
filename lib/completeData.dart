@@ -1,197 +1,245 @@
 import 'package:flutter/material.dart';
-import 'dataPersonal.dart';
+import 'package:simi/api_services.dart';
+import 'edit_buttom_sheet.dart';
 
-class CompleteDataPage extends StatefulWidget {
-  const CompleteDataPage({Key? key}) : super(key: key);
+class CompletaData extends StatefulWidget {
+  const CompletaData({super.key});
 
   @override
-  _CompleteDataPageState createState() => _CompleteDataPageState();
+  State<CompletaData> createState() => _CompletaDataState();
 }
 
-class _CompleteDataPageState extends State<CompleteDataPage> {
-  final Map<String, TextEditingController> controllers = {};
-  String selectedOption = 'ex';
+class _CompletaDataState extends State<CompletaData> {
+  Map<String, dynamic>? userData;
+  bool isLoading = true;
 
-  final Map<String, String> previousData = {
-    'ID PMI': '12345',
-    'Tgl. Pendaftaran': '2024-01-01',
-    'Nama Lengkap': 'Dewi Ayu',
-    'Tempat Lahir': 'Bandung',
-    'Tgl. Lahir': '2000-12-12',
-    'NIK': '3201011234567890',
+  // Peta nama label ke nama field di backend
+  final Map<String, String> fieldKeyMap = {
+    // Personal Data
+    "No KTP": "id_card_number",
+    "No KK": "family_card_number",
+    "No Paspor": "passport_number",
+    "Tempat Lahir": "birth_place",
+    "Tanggal Lahir": "birth_date",
+    "No Ijazah": "diploma_number",
+    "Pre Medical": "pre_medical_checkup",
+    "Full Medical": "full_medical_checkup",
+
+    // Documents
+    "Sertifikat Vaksin": "vaccine_certificate",
+    "Surat Izin": "permit_letter",
+    "SKCK": "police_clearance",
+    "Akte Nikah": "marriage_certificate",
+    "Paspor": "passport",
+    "KTP": "identity_card",
+    "Ijazah": "diploma",
+    "Kartu Keluarga": "family_register",
+
+    // User Details
+    "Nama Agency": "agency_name",
+    "Posisi": "position",
+    "Visa TETO": "visa_teto",
+    "Sponsor": "sponsor",
   };
+
+  // Tentukan bagian data dari field
+  String getSection(String label) {
+    if ([
+      "No KTP",
+      "No KK",
+      "No Paspor",
+      "Tempat Lahir",
+      "Tanggal Lahir",
+      "No Ijazah",
+      "Pre Medical",
+      "Full Medical"
+    ].contains(label)) return "personal_data";
+
+    if ([
+      "Sertifikat Vaksin",
+      "Surat Izin",
+      "SKCK",
+      "Akte Nikah",
+      "Paspor",
+      "KTP",
+      "Ijazah",
+      "Kartu Keluarga"
+    ].contains(label)) return "user_documents";
+
+    return "user_details";
+  }
 
   @override
   void initState() {
     super.initState();
-    for (var key in _formFields) {
-      controllers[key] = TextEditingController(text: previousData[key] ?? '');
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    final result = await ApiService.getUserProfile();
+    if (result['success']) {
+      setState(() {
+        userData = result['data'];
+        isLoading = false;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
     }
   }
 
-  @override
-  void dispose() {
-    for (var controller in controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
+  Map<String, String> _formatPersonalData() {
+    final personal = userData?['personal_data'] ?? {};
+    return {
+      "No KTP": personal['id_card_number'] ?? '',
+      "No KK": personal['family_card_number'] ?? '',
+      "No Paspor": personal['passport_number'] ?? '',
+      "Tempat Lahir": personal['birth_place'] ?? '',
+      "Tanggal Lahir": personal['birth_date'] ?? '',
+      "No Ijazah": personal['diploma_number'] ?? '',
+      "Pre Medical": personal['pre_medical_checkup'] ?? '',
+      "Full Medical": personal['full_medical_checkup'] ?? '',
+    };
   }
 
-  List<String> get _formFields => [
-        'ID PMI',
-        'Tgl. Pendaftaran',
-        'Nama Lengkap',
-        'Tempat Lahir',
-        'Tgl. Lahir',
-        'NIK',
-        'No. KK',
-        'No. Paspor',
-        'No. KTP',
-        'No. Ijazah',
-        'Full Medical',
-        'Pra Medical',
-        'Jabatan',
-        'Visa',
-        'Status Pernikahan',
-        'Sponsor',
-        'Tgl. Pendaftaran ID',
-        'Tgl. Keberangkatan',
-        'Tgl. Kepulangan',
-        'Pass Foto',
-        'Foto Visa',
-        'Foto KTP',
-        'Foto Akta Kelahiran',
-        'Foto KK',
-        'SKCK',
-        'Foto PP',
-        'Foto Surat Izin',
-        'Foto Ijazah',
-      ];
-
-  void _clearData() {
-    for (var controller in controllers.values) {
-      controller.clear();
-    }
+  Map<String, String> _formatUserDetails() {
+    final details = userData?['user_details'] ?? {};
+    return {
+      "Nama Agency": details['agency_name'] ?? '',
+      "Posisi": details['position'] ?? '',
+      "Visa TETO": details['visa_teto'] ?? '',
+      "Sponsor": details['sponsor'] ?? '',
+    };
   }
 
-  void _deleteData() {
-    setState(() {
-      for (var controller in controllers.values) {
-        controller.clear();
-      }
-      selectedOption = 'ex';
-    });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Data berhasil dihapus'),
-      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
-    ));
-  }
-
-  void _saveData() {
-    print('Data tersimpan!');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Data berhasil disimpan'),
-      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
-    ));
-  }
-
-  void _navigateToEdit() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PersonalDataPage()), 
-    );
+  Map<String, String> _formatUserDocuments() {
+    final documents = userData?['user_documents'] ?? {};
+    return {
+      "Sertifikat Vaksin": documents['vaccine_certificate'] ?? '',
+      "Surat Izin": documents['permit_letter'] ?? '',
+      "SKCK": documents['police_clearance'] ?? '',
+      "Akte Nikah": documents['marriage_certificate'] ?? '',
+      "Paspor": documents['passport'] ?? '',
+      "KTP": documents['identity_card'] ?? '',
+      "Ijazah": documents['diploma'] ?? '',
+      "Kartu Keluarga": documents['family_register'] ?? '',
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Informasi Pengguna"),
+          backgroundColor: Colors.pink[300],
+          foregroundColor: Colors.white,
+          centerTitle: true,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Personal Data"),
-        foregroundColor: Colors.pinkAccent,
-        elevation: 0,
+        title: const Text("Informasi Pengguna"),
+        backgroundColor: Colors.pink[300],
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
-      body: SafeArea(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                children: [
-                  for (var field in controllers.entries)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: TextField(
-                        controller: field.value,
-                        enabled: false, // tidak bisa diedit di sini
-                        decoration: InputDecoration(
-                          labelText: field.key,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 8),
-                  const Text("Status:"),
-                  Row(
-                    children: ['ex', 'non'].map((option) {
-                      return Expanded(
-                        child: RadioListTile<String>(
-                          title: Text(option),
-                          value: option,
-                          groupValue: selectedOption,
-                          onChanged: null, // disabled
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _navigateToEdit,
-                    icon: Icon(Icons.edit),
-                    label: Text('Edit'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _saveData,
-                    icon: Icon(Icons.save),
-                    label: Text('Save'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _clearData,
-                    icon: Icon(Icons.clear),
-                    label: Text('Clear'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _deleteData,
-                    icon: Icon(Icons.delete),
-                    label: Text('Delete'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 247, 198, 229),
-                    ),
-                  ),
-                ],
-              ),
-            )
+            _buildSectionTitle("🧍 Data Pribadi"),
+            ..._buildInfoList(_formatPersonalData(), context),
+            const SizedBox(height: 24),
+
+            _buildSectionTitle("📁 Dokumen Pengguna"),
+            ..._buildInfoList(_formatUserDocuments(), context, isDocument: true),
+            const SizedBox(height: 24),
+
+            _buildSectionTitle("🏢 Detail Pengguna"),
+            ..._buildInfoList(_formatUserDetails(), context),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.pink,
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildInfoList(
+    Map<String, String> data,
+    BuildContext context, {
+    bool isDocument = false,
+  }) {
+    return data.entries.map((entry) {
+      return Card(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 3,
+        child: ListTile(
+          title: Text(entry.key),
+          subtitle: Text(entry.value),
+          trailing: Hero(
+            tag: '${entry.key}-edit',
+            child: IconButton(
+              icon: const Icon(Icons.edit, color: Colors.pink),
+              onPressed: () {
+                showEditBottomSheet(
+                  context,
+                  entry.key,
+                  entry.value,
+                  (newValue) async {
+                    final fieldName = fieldKeyMap[entry.key];
+                    final section = getSection(entry.key);
+
+                    if (fieldName == null) return;
+
+                          final updateData = {
+                          fieldName: newValue,
+                  };
+
+
+                    final result = await ApiService.updateUserProfile(updateData);
+
+                    if (result['success']) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Berhasil diperbarui")),
+                      );
+                      fetchUserData();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Gagal memperbarui: ${result['message']}")),
+                      );
+                    }
+                  },
+                );
+              },
+            ),
+          ),
+          onTap: isDocument
+              ? () {
+                  // Implementasi preview dokumen jika perlu
+                }
+              : null,
+        ),
+      );
+    }).toList();
   }
 }

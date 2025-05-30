@@ -165,7 +165,7 @@ class _DashboardState extends State<Dashboard> {
                   _buildMenuItem(Icons.assignment_turned_in, "complete data",
                       () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => CompleteDataPage()));
+                        MaterialPageRoute(builder: (_) => CompletaData()));
                   }),
                   _buildMenuItem(Icons.flight_takeoff, "keberangkatan", () {
                     Navigator.push(context,
