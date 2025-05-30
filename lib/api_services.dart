@@ -103,48 +103,50 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> register(String username, String email,
-      String password, String noTelp, String jk) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/register'),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'username': username,
-          'email': email,
-          'password': password,
-          'no_telp': noTelp,
-          'JK': jk,
-        }),
-      );
+    String password, String noTelp, String jk) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/auth/register'),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'username': username,
+        'email': email,
+        'password': password,
+        'no_telp': noTelp,
+        'JK': jk,
+      }),
+    );
 
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+    print('Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
 
-      final data = jsonDecode(response.body);
+    final data = jsonDecode(response.body);
 
-      if (response.statusCode == 201 && data['status'] == true) {
-        await AuthMiddleware.saveAuthData(data['token'], data['data']);
-        return {
-          'success': true,
-          'data': data['data'],
-          'token': data['token'],
-        };
-      } else {
-        return {
-          'success': false,
-          'message': data['message'] ?? 'Registrasi gagal',
-        };
-      }
-    } catch (e) {
+    if (response.statusCode == 201 && data['status'] == true) {
+      await AuthMiddleware.saveAuthData(data['token'], data['data']);
+      return {
+        'success': true,
+        'data': data['data'],
+        'token': data['token'],
+      };
+    } else {
       return {
         'success': false,
-        'message': 'Terjadi kesalahan: $e',
+        'message': data['message'] ?? 'Registrasi gagal',
+        'errors': data['errors'], 
       };
     }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Terjadi kesalahan: $e',
+    };
   }
+}
+
 
   static Future<bool> logout() async {
     final token = await AuthMiddleware.getToken();
