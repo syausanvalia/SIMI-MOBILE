@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simi/homepage.dart';
 import 'GoogleSuccessPage.dart';
 import 'login.dart';
 import 'custom_navbar.dart';
@@ -22,10 +23,10 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [
-        const Locale('id'), // Bahasa Indonesia
-        const Locale('en'), // Fallback English
+        const Locale('id'),
+        const Locale('en'),
       ],
-      initialRoute: '/login',
+      initialRoute: '/homepage',
       onGenerateRoute: (settings) {
         if (settings.name?.startsWith('/google-success') ?? false) {
           return MaterialPageRoute(
@@ -35,12 +36,14 @@ class MyApp extends StatelessWidget {
         }
 
         switch (settings.name) {
+          case '/homepage':
+            return MaterialPageRoute(builder: (_) => const HomePage());
           case '/login':
             return MaterialPageRoute(builder: (_) => const LoginPage());
           case '/dashboard':
             return MaterialPageRoute(builder: (_) => const CustomNavBarPage());
           default:
-            return MaterialPageRoute(builder: (_) => const LoginPage());
+            return MaterialPageRoute(builder: (_) => const HomePage());
         }
       },
     );

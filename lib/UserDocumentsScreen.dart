@@ -104,7 +104,7 @@ class _UserDocumentsScreenState extends State<UserDocumentsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Upload Documents'),
-        backgroundColor: Colors.pink[100],
+        foregroundColor: Colors.pink,
       ),
       body: Container(
         decoration: BoxDecoration(

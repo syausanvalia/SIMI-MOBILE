@@ -62,7 +62,7 @@ class _DaftarKelasPageState extends State<DaftarKelasPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Kelas Tersedia'),
-        backgroundColor: Colors.pink[100],
+        foregroundColor: Colors.pinkAccent,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

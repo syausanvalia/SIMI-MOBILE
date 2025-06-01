@@ -97,15 +97,15 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildTextField(_idCardController, 'ID Card Number'),
-                _buildTextField(_citizenIdController, 'Citizen ID'),
-                _buildTextField(_passportNumberController, 'Passport Number'),
-                _buildTextField(_familyCardController, 'Family Card Number'),
-                _buildTextField(_birthPlaceController, 'Birth Place'),
-                _buildDateField(_birthDateController, 'Birth Date'),
-                _buildTextField(_diplomaNumberController, 'Diploma Number'),
-                _buildDateField(_preMedicalController, 'Pre Medical Checkup Date'),
-                _buildDateField(_fullMedicalController, 'Full Medical Checkup Date'),
+                _buildTextField(_idCardController, 'ID PMI'),
+                _buildTextField(_citizenIdController, 'KTP'),
+                _buildTextField(_passportNumberController, 'Nomor Paspor'),
+                _buildTextField(_familyCardController, 'Nomor KK'),
+                _buildTextField(_birthPlaceController, 'Tempat Lahir'),
+                _buildDateField(_birthDateController, 'Tanggal Lahir'),
+                _buildTextField(_diplomaNumberController, 'Nomor Ijazah'),
+                _buildDateField(_preMedicalController, 'Pre Medical'),
+                _buildDateField(_fullMedicalController, 'Full Medical'),
                 SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -121,7 +121,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                         : Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                          Text('Next'),
+                          Text('next'),
                           SizedBox(width: 8),
                          Icon(Icons.arrow_forward),
                       ],

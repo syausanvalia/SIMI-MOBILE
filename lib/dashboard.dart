@@ -1,11 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:simi/api_services.dart';
 import 'package:simi/graduation.dart';
-import 'package:simi/konfirmasiPayment.dart';
 import 'package:simi/login.dart';
 import 'package:simi/trainingSchadule.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'dataPersonal.dart';
 import 'completeData.dart';
 import 'berita.dart';
 import 'infoPekerjaan.dart';
@@ -32,32 +31,63 @@ class _DashboardState extends State<Dashboard> {
   bool isLoading = true;
   bool hasError = false;
 
+  List<String> imageList = [
+    'assets/fotodashboard.png',
+    'assets/fotodashboard2.png',
+  ];
+
+  late PageController _pageController;
+  int _currentPage = 0;
+
   @override
   void initState() {
     super.initState();
     fetchDashboardData();
+
+    _pageController = PageController(initialPage: 0);
+
+    Timer.periodic(Duration(seconds: 3), (Timer timer) {
+      if (_currentPage < imageList.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          _currentPage,
+          duration: Duration(milliseconds: 350),
+          curve: Curves.easeIn,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchDashboardData() async {
-  try {
-    final data = await ApiService.getDashboard();
-    print("RESPON DASHBOARD: $data");
-    if (!mounted) return; 
-    setState(() {
-      welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
-      isLoading = false;
-    });
-  } catch (e) {
-    print("ERROR DASHBOARD: $e");
-    if (!mounted) return;  
-    setState(() {
-      welcomeMessage = "Gagal memuat data";
-      hasError = true;
-      isLoading = false;
-    });
+    try {
+      final data = await ApiService.getDashboard();
+      print("RESPON DASHBOARD: $data");
+      if (!mounted) return;
+      setState(() {
+        welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
+        isLoading = false;
+      });
+    } catch (e) {
+      print("ERROR DASHBOARD: $e");
+      if (!mounted) return;
+      setState(() {
+        welcomeMessage = "Gagal memuat data";
+        hasError = true;
+        isLoading = false;
+      });
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +112,7 @@ class _DashboardState extends State<Dashboard> {
                       return [
                         PopupMenuItem(
                           value: 'logout',
-                          child: Text('Logout'),
+                          child: Text('Keluar'),
                         ),
                       ];
                     },
@@ -100,37 +130,20 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                image: DecorationImage(
-                  image: AssetImage('assets/fotodashboard.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
               height: 160,
-              child: Stack(
-                children: [
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    child: Text(
-                      'Grow better\ntogether',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 245, 211, 211),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black45,
-                            offset: Offset(1, 1),
-                            blurRadius: 3,
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                ],
+              margin: EdgeInsets.symmetric(horizontal: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: imageList.length,
+                  itemBuilder: (context, index) {
+                    return Image.asset(
+                      imageList[index],
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
               ),
             ),
             Padding(
@@ -159,36 +172,36 @@ class _DashboardState extends State<Dashboard> {
                 childAspectRatio: 1,
                 shrinkWrap: true,
                 children: [
-                  _buildMenuItem(Icons.account_box, "personal data", () {
+                  _buildMenuItem(Icons.account_box, "Data Pribadi", () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => PersonalDataScreen()));
                   }),
-                  _buildMenuItem(Icons.assignment_turned_in, "complete data",
+                  _buildMenuItem(Icons.assignment_turned_in, "Kelengkapan Data",
                       () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => CompletaData()));
                   }),
-                  _buildMenuItem(Icons.flight_takeoff, "keberangkatan", () {
+                  _buildMenuItem(Icons.flight_takeoff, "Keberangkatan", () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => InfoberangkatPage()));
                   }),
-                  _buildMenuItem(Icons.school, "graduation", () {
+                  _buildMenuItem(Icons.school, "Kelulusan", () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => GraduationPage()));
                   }),
-                  _buildMenuItem(Icons.schedule_sharp, "training schadule", () {
+                  _buildMenuItem(Icons.schedule_sharp, "Jadwal Pelatihan", () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => TrainingSchedulePage()));
                   }),
-                  _buildMenuItem(Icons.grade, "final score", () {
+                  _buildMenuItem(Icons.grade, "Hasil Nilai", () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => FinalScorePage()));
                   }),
-                  _buildMenuItem(Icons.class_, "daftar kelas", () {
+                  _buildMenuItem(Icons.class_, "Kelas Pelatihan", () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (_) => DaftarKelasPage()));
                   }),
@@ -248,11 +261,11 @@ class _DashboardState extends State<Dashboard> {
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.pink[50],
         title: Text(
-          'Logout Confirmation',
+          'Keluar dari akun',
           style: TextStyle(color: Colors.black),
         ),
         content: Text(
-          'Are you sure you want to logout?',
+          'Anda yakin ingin keluar dari akun?',
           style: TextStyle(color: Colors.black),
         ),
         actions: [
@@ -260,7 +273,7 @@ class _DashboardState extends State<Dashboard> {
             onPressed: () {
               Navigator.of(ctx).pop();
             },
-            child: Text('Cancel', style: TextStyle(color: Colors.black)),
+            child: Text('Batal', style: TextStyle(color: Colors.black)),
           ),
           TextButton(
             onPressed: () async {
@@ -277,13 +290,13 @@ class _DashboardState extends State<Dashboard> {
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Gagal logout. Silakan coba lagi.'),
+                    content: Text('Gagal keluar. Silakan coba lagi!'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            child: Text('Logout', style: TextStyle(color: Colors.black)),
+            child: Text('Keluar', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),

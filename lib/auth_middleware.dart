@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthMiddleware {
-  // Key untuk menyimpan token dan data user
   static const String tokenKey = 'auth_token';
   static const String userDataKey = 'user_data';
 

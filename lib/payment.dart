@@ -59,7 +59,7 @@ class PaymentPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Payment Now!',
+                    'Lakukan Pembayaran Sekarang',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -89,7 +89,7 @@ class PaymentPage extends StatelessWidget {
                       children: [
                         Center(
                           child: Text(
-                            'PAKET PELATIHAN',
+                            'Paket Pelatihan',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,

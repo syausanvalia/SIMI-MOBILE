@@ -1,5 +1,3 @@
-// forgotpass.dart
-
 import 'package:flutter/material.dart';
 import 'verification.dart';
 import 'api_services.dart';

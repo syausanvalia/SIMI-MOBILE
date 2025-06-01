@@ -144,8 +144,7 @@ class _CompletaDataState extends State<CompletaData> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Informasi Pengguna"),
-        backgroundColor: Colors.pink[300],
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.pink,
         centerTitle: true,
       ),
       body: SingleChildScrollView(

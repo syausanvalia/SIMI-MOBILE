@@ -116,7 +116,7 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
                 "Status: ${isPaid ? 'Menunggu Konfirmasi Admin' : item['status']}",
                 style: TextStyle(
                   fontSize: 14,
-                  color: isPaid ? Colors.orange : Colors.grey[700],
+                  color: isPaid ? Colors.white : Colors.grey[700],
                 ),
               ),
               SizedBox(height: 12),
@@ -128,7 +128,7 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
                       backgroundColor: isActive
                           ? Colors.green
                           : (isPaid ? Colors.grey : Colors.pinkAccent),
-                      foregroundColor: Colors.white,
+                      foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -209,7 +209,7 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.pink[100],
+        foregroundColor: Colors.pinkAccent,
         title: Text("Keranjang Pelatihan"),
       ),
       body: isLoading

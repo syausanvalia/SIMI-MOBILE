@@ -109,9 +109,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildTextField(_agencyNameController, 'Agency Name'),
-                _buildTextField(_positionController, 'Position'),
-                _buildTextField(_visaTetoController, 'Visa Teto'),
+                _buildTextField(_agencyNameController, 'Nama Agensi'),
+                _buildTextField(_positionController, 'Posisi Pekerjaan'),
+                _buildTextField(_visaTetoController, 'Visa'),
                 _buildTextField(_sponsorController, 'Sponsor'),
                 const SizedBox(height: 20),
                 ElevatedButton(
@@ -133,7 +133,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Text('Finish'),
+                            Text('Simpan'),
                             SizedBox(width: 8),
                             Icon(Icons.check),
                           ],

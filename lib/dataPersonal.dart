@@ -98,7 +98,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                     child: const Icon(Icons.arrow_back_ios_new, size: 20),
                   ),
                   const Text(
-                    "Complete your data here !",
+                    "Lengkapi data diri anda!",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   GestureDetector(

@@ -470,24 +470,40 @@ class _CustomNavBarPageState extends State<CustomNavBarPage> {
       Icon(Icons.article_outlined, size: 30, color: Colors.grey),
     ];
 
-    return Scaffold(
-      body: _getPageByIndex(_currentIndex),
-      bottomNavigationBar: CurvedNavigationBar(
-        key: navigationKey,
-        color: Colors.pink.shade100,
-        backgroundColor: Colors.white,
-        buttonBackgroundColor: Colors.pink.shade100,
-        height: 60,
-        index: _currentIndex,
-        items: items,
-        animationDuration: const Duration(milliseconds: 300),
-        animationCurve: Curves.easeInOut,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+          return Container(
+      color: Colors.pink[100],
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.white,
+          body: _getPageByIndex (_currentIndex),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromRGBO(248, 187, 208, 1),
+                  const Color.fromARGB(255, 255, 243, 214),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: CurvedNavigationBar(
+              key: navigationKey,
+              color: Colors.transparent, 
+              buttonBackgroundColor: Colors.white, 
+              backgroundColor: Colors.transparent,
+              height: 60,
+              animationCurve: Curves.easeInOut,
+              animationDuration: const Duration(milliseconds: 300),
+              index: _currentIndex,
+              items: items,
+              onTap: (index) => setState(() => _currentIndex = index),
+            ),
+          ),
+        ),
       ),
     );
   }
-}
+  }
