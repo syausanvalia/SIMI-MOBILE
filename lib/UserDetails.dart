@@ -24,6 +24,153 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     super.dispose();
   }
 
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.green.shade50,
+                  ),
+                  child: Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 50,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Berhasil!',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Anda berhasil mengupload data pribadi anda!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => CustomNavBarPage()),
+                      (route) => false,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 250, 195, 213),
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'OK',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.red.shade50,
+                  ),
+                  child: Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 50,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Gagal!',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Ada masalah, tunggu beberapa saat lagi atau hubungi admin!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 250, 195, 213),
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Coba Lagi',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _submitUserDetails() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -40,29 +187,12 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       );
 
       if (response['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Data submitted successfully')),
-        );
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => CustomNavBarPage()),
-          (route) => false,
-        );
+        _showSuccessDialog();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Submission failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showErrorDialog();
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showErrorDialog();
     } finally {
       setState(() {
         _isLoading = false;
@@ -72,17 +202,29 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
   Widget _buildTextField(TextEditingController controller, String label) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.white,
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
         ),
-        validator: (value) =>
-            value == null || value.isEmpty ? 'Please enter $label' : null,
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            border: InputBorder.none,
+            filled: true,
+            fillColor: Colors.transparent,
+          ),
+          validator: (value) =>
+              value == null || value.isEmpty ? 'Please enter $label' : null,
+          style: TextStyle(fontSize: 14),
+        ),
       ),
     );
   }
@@ -90,57 +232,73 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('User Details'),
-        backgroundColor: Color.fromARGB(255, 250, 195, 213),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.pink[50]!],
-          ),
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildTextField(_agencyNameController, 'Nama Agensi'),
-                _buildTextField(_positionController, 'Posisi Pekerjaan'),
-                _buildTextField(_visaTetoController, 'Visa'),
-                _buildTextField(_sponsorController, 'Sponsor'),
-                const SizedBox(height: 20),
-                ElevatedButton(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  "User Details",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              SizedBox(height: 32),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        _buildTextField(_agencyNameController, 'Nama Agensi'),
+                        _buildTextField(_positionController, 'Posisi Pekerjaan'),
+                        _buildTextField(_visaTetoController, 'Visa'),
+                        _buildTextField(_sponsorController, 'Sponsor'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
                   onPressed: _isLoading ? null : _submitUserDetails,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromARGB(255, 250, 195, 213),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             color: Colors.white,
-                            strokeWidth: 2,
                           ),
                         )
                       : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text('Simpan'),
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Save',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             SizedBox(width: 8),
-                            Icon(Icons.check),
+                            Icon(Icons.check, size: 18),
                           ],
                         ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

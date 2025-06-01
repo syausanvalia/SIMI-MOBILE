@@ -21,8 +21,7 @@ class _UserDocumentsScreenState extends State<UserDocumentsScreen> {
     'family_register': null,
   };
 
-  Map<String, String?> fileNames = {}; // Untuk menampilkan nama file ke UI
-
+  Map<String, String?> fileNames = {};
   bool _isLoading = false;
 
   Future<void> pickFile(String documentType) async {
@@ -37,7 +36,6 @@ class _UserDocumentsScreenState extends State<UserDocumentsScreen> {
         fileNames[documentType] = result.files.single.name;
       });
     } else {
-      // Optional: bisa kasih feedback kalau gagal pilih file
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to pick file.')),
       );
@@ -102,94 +100,120 @@ class _UserDocumentsScreenState extends State<UserDocumentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Upload Documents'),
-        foregroundColor: Colors.pink,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.pink[50]!],
-          ),
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(16.0),
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  String documentType = documents.keys.elementAt(index);
-                  String? displayName = fileNames[documentType];
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  "Upload Your Documents",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              SizedBox(height: 32),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: documents.length,
+                  itemBuilder: (context, index) {
+                    String documentType = documents.keys.elementAt(index);
+                    String? displayName = fileNames[documentType];
 
-                  return Card(
-                    elevation: 2,
-                    margin: EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      title: Text(documentType),
-                      subtitle: displayName != null
-                          ? Text(displayName)
-                          : Text('No file selected'),
-                      trailing: ElevatedButton(
-                        onPressed: () => pickFile(documentType),
-                        child: Text('Pick File'),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.arrow_back),
-                        SizedBox(width: 8),
-                        Text('Previous'),
-                      ],
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 250, 195, 213),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : uploadDocuments,
-                    child: _isLoading
-                        ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            documentType.replaceAll('_', ' ').toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
-                          )
-                        : Row(
-                            children: [
-                              Text('Next'),
-                              SizedBox(width: 8),
-                              Icon(Icons.arrow_forward),
-                            ],
                           ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 250, 195, 213),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          subtitle: displayName != null
+                              ? Text(
+                                  displayName,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                )
+                              : null,
+                          trailing: ElevatedButton(
+                            onPressed: () => pickFile(documentType),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color.fromARGB(255, 250, 195, 213),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                            ),
+                            child: Text(
+                              'Choose File',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : uploadDocuments,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 250, 195, 213),
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                ],
+                  child: _isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Next',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.arrow_forward, size: 18),
+                          ],
+                        ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

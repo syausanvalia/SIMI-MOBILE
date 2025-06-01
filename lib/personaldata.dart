@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 import 'UserDocumentsScreen.dart';
 import 'api_services.dart';
 
@@ -19,8 +20,24 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   TextEditingController _diplomaNumberController = TextEditingController();
   TextEditingController _preMedicalController = TextEditingController();
   TextEditingController _fullMedicalController = TextEditingController();
+  TextEditingController _nikController = TextEditingController();
 
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateRandomIdPmi();
+  }
+
+  void _generateRandomIdPmi() {
+    final random = Random();
+    String randomId = '';
+    for (int i = 0; i < 6; i++) {
+      randomId += random.nextInt(10).toString();
+    }
+    _idCardController.text = randomId;
+  }
 
   Future<void> _submitPersonalData() async {
     if (!_formKey.currentState!.validate()) {
@@ -75,65 +92,101 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Personal Data'),
-        backgroundColor: Color.fromARGB(255, 250, 195, 213),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Color.fromARGB(255, 250, 195, 213)!],
-          ),
-        ),
+      body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildTextField(_idCardController, 'ID PMI'),
-                _buildTextField(_citizenIdController, 'KTP'),
-                _buildTextField(_passportNumberController, 'Nomor Paspor'),
-                _buildTextField(_familyCardController, 'Nomor KK'),
-                _buildTextField(_birthPlaceController, 'Tempat Lahir'),
-                _buildDateField(_birthDateController, 'Tanggal Lahir'),
-                _buildTextField(_diplomaNumberController, 'Nomor Ijazah'),
-                _buildDateField(_preMedicalController, 'Pre Medical'),
-                _buildDateField(_fullMedicalController, 'Full Medical'),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                   ElevatedButton(
-                          onPressed: _isLoading ? null : _submitPersonalData,
-                          child: _isLoading
-                          ? SizedBox(
-                           height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(color: Colors.white),
-                          )
-                        : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                          Text('next'),
-                          SizedBox(width: 8),
-                         Icon(Icons.arrow_forward),
-                      ],
-                    ),
-                    style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 250, 195, 213),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      "Complete your data here !",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  SizedBox(height: 32),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.grey.shade100,
+                    ),
+                    child: TextFormField(
+                      controller: _idCardController,
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        hintText: 'ID PMI',
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(color: Colors.black54),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  _buildPlainField(_citizenIdController, 'No. KTP'),
+                  SizedBox(height: 20),
+                  _buildPlainField(_nikController, 'NIK'),
+                  SizedBox(height: 20),
+                  _buildPlainField(_familyCardController, 'No. KK'),
+                  SizedBox(height: 20),
+                  _buildPlainField(_passportNumberController, 'No. Paspor'),
+                  SizedBox(height: 20),
+                  _buildPlainField(_birthPlaceController, 'Tempat Lahir'),
+                  SizedBox(height: 20),
+                  _buildDateOnlyField(_birthDateController, 'Tgl. Lahir'),
+                  SizedBox(height: 20),
+                  _buildPlainField(_diplomaNumberController, 'No. Ijazah'),
+                  SizedBox(height: 20),
+                  _buildDateOnlyField(_preMedicalController, 'Pra Medical'),
+                  SizedBox(height: 20),
+                  _buildDateOnlyField(_fullMedicalController, 'Full Medical'),
+                  SizedBox(height: 32),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submitPersonalData,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 250, 195, 213),
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(color: Colors.white),
+                            )
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Next',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Icon(Icons.arrow_forward),
+                              ],
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -141,37 +194,48 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
+  Widget _buildPlainField(TextEditingController controller, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.white,
+          hintText: label,
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          border: InputBorder.none,
+          hintStyle: TextStyle(color: Colors.black54),
         ),
         validator: (value) => (value == null || value.isEmpty) ? 'Please enter $label' : null,
       ),
     );
   }
 
-  Widget _buildDateField(TextEditingController controller, String label) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
+  Widget _buildDateOnlyField(TextEditingController controller, String label) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: TextFormField(
         controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: Icon(Icons.calendar_today),
-        ),
         readOnly: true,
+        decoration: InputDecoration(
+          hintText: label,
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          border: InputBorder.none,
+          suffixIcon: Padding(
+            padding: EdgeInsets.only(right: 12),
+            child: Icon(Icons.calendar_today, size: 20, color: Colors.grey),
+          ),
+          hintStyle: TextStyle(color: Colors.black54),
+        ),
         onTap: () async {
-          final DateTime? picked = await showDatePicker(
+          final picked = await showDatePicker(
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(1900),
