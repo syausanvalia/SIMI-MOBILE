@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
+import 'package:lottie/lottie.dart';
+import 'completedata.dart'; // Pastikan file ini ada
 import 'UserDocumentsScreen.dart';
 import 'api_services.dart';
+import 'dashboard.dart';
 
 class PersonalDataScreen extends StatefulWidget {
   @override
@@ -23,11 +26,13 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   TextEditingController _nikController = TextEditingController();
 
   bool _isLoading = false;
+  bool _alreadySubmitted = false;
 
   @override
   void initState() {
     super.initState();
     _generateRandomIdPmi();
+    _checkIfDataAlreadySubmitted();
   }
 
   void _generateRandomIdPmi() {
@@ -37,6 +42,62 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       randomId += random.nextInt(10).toString();
     }
     _idCardController.text = randomId;
+  }
+
+  Future<void> _checkIfDataAlreadySubmitted() async {
+    final result = await ApiService.getUserProfile();
+
+    if (result['success']) {
+      final personalData = result['data']['personal_data'];
+
+      // Cek jika field penting dari personal data tidak null / kosong
+      final isFilled = personalData != null &&
+          personalData['citizen_id'] != null &&
+          personalData['citizen_id'].toString().isNotEmpty;
+
+      if (isFilled) {
+        setState(() {
+          _alreadySubmitted = true;
+        });
+
+        Future.delayed(Duration.zero, () {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Lottie.asset('assets/lottie/classtidakbisadiakses.json',
+                      width: 180, height: 180, repeat: true),
+                  SizedBox(height: 16),
+                  Text(
+                    'Anda sudah mengisi data dan dokumen, silahkan ke halaman berikut jika ingin mengubah.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => CompletaData()),
+                    );
+                  },
+                  child: Text('OK'),
+                )
+              ],
+            ),
+          );
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Gagal memuat data')),
+      );
+    }
   }
 
   Future<void> _submitPersonalData() async {
@@ -67,24 +128,19 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
         );
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => UserDocumentsScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => UserDocumentsScreen()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response['message']),
-            backgroundColor: Colors.red,
-          ),
+              content: Text(response['message']), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('An error occurred: $e'),
-          backgroundColor: Colors.red,
-        ),
+            content: Text('An error occurred: $e'),
+            backgroundColor: Colors.red),
       );
     } finally {
       setState(() {
@@ -95,7 +151,39 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_alreadySubmitted) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+      );
+    }
+
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFFF9F8FC),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.pink),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => CustomNavBarPage()),
+            );
+          },
+        ),
+        centerTitle: true,
+        title: Text(
+          'Personal Data',
+          style: TextStyle(color: Colors.pink, fontWeight: FontWeight.w500),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.pink),
+            onPressed: () {
+              setState(() {});
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -108,10 +196,8 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                   Center(
                     child: Text(
                       "Complete your data here !",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ),
                   SizedBox(height: 32),
@@ -127,7 +213,8 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                       decoration: InputDecoration(
                         hintText: 'ID PMI',
                         isDense: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         border: InputBorder.none,
                         hintStyle: TextStyle(color: Colors.black54),
                       ),
@@ -158,7 +245,8 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                       onPressed: _isLoading ? null : _submitPersonalData,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromARGB(255, 250, 195, 213),
-                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -167,18 +255,15 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                           ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color: Colors.white),
-                            )
+                              child: CircularProgressIndicator(
+                                  color: Colors.white))
                           : Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'Next',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                Text('Next',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
                                 SizedBox(width: 8),
                                 Icon(Icons.arrow_forward),
                               ],
@@ -209,7 +294,8 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
           border: InputBorder.none,
           hintStyle: TextStyle(color: Colors.black54),
         ),
-        validator: (value) => (value == null || value.isEmpty) ? 'Please enter $label' : null,
+        validator: (value) =>
+            (value == null || value.isEmpty) ? 'Please enter $label' : null,
       ),
     );
   }

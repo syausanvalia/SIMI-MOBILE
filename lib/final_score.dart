@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:simi/api_services.dart';
 import 'package:simi/berita.dart';
 import 'package:simi/infoPekerjaan.dart';
@@ -12,16 +13,28 @@ class FinalScorePage extends StatefulWidget {
   State<FinalScorePage> createState() => _FinalScorePageState();
 }
 
-class _FinalScorePageState extends State<FinalScorePage> {
+class _FinalScorePageState extends State<FinalScorePage> with TickerProviderStateMixin {
   int currentIndex = 1;
   List<Map<String, dynamic>> examScores = [];
   bool isLoading = true;
   String errorMessage = '';
+  bool showNoDataPopup = false;
+  late AnimationController _popupAnimationController;
 
   @override
   void initState() {
     super.initState();
+    _popupAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     fetchScores();
+  }
+
+  @override
+  void dispose() {
+    _popupAnimationController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchScores() async {
@@ -29,9 +42,17 @@ class _FinalScorePageState extends State<FinalScorePage> {
       setState(() {
         isLoading = true;
         errorMessage = '';
+        showNoDataPopup = false;
       });
 
       final scores = await ApiService.fetchExamScores();
+      if (scores.isEmpty) {
+        setState(() {
+          showNoDataPopup = true;
+        });
+        _popupAnimationController.forward();
+      }
+
       setState(() {
         examScores = scores;
         isLoading = false;
@@ -112,14 +133,62 @@ class _FinalScorePageState extends State<FinalScorePage> {
     );
   }
 
+  void _showNoDataDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => ScaleTransition(
+        scale: CurvedAnimation(
+          parent: _popupAnimationController,
+          curve: Curves.elasticOut,
+        ),
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          contentPadding: const EdgeInsets.all(16),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset('assets/lottie/nilai.json', width: 150, height: 150, repeat: true),
+              const SizedBox(height: 16),
+              const Text(
+                "Tidak ada data nilai",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  setState(() => showNoDataPopup = false);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.pinkAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  child: Text("Oke", style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (showNoDataPopup) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showNoDataDialog());
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            // Top bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -136,9 +205,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.refresh),
-                    onPressed: () {
-                      fetchScores(); // refresh nilai
-                    },
+                    onPressed: () => fetchScores(),
                   ),
                 ],
               ),
@@ -153,14 +220,12 @@ class _FinalScorePageState extends State<FinalScorePage> {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Content
             if (isLoading)
               const Center(child: CircularProgressIndicator())
             else if (errorMessage.isNotEmpty)
               Center(child: Text(errorMessage, style: const TextStyle(color: Colors.red)))
             else if (examScores.isEmpty)
-              const Center(child: Text('Tidak ada data nilai'))
+              const SizedBox.shrink() // Sudah ditangani oleh dialog
             else
               Expanded(
                 child: RefreshIndicator(
@@ -168,8 +233,7 @@ class _FinalScorePageState extends State<FinalScorePage> {
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: examScores.length,
-                    itemBuilder: (context, index) =>
-                        buildScoreCard(examScores[index], index),
+                    itemBuilder: (context, index) => buildScoreCard(examScores[index], index),
                   ),
                 ),
               ),

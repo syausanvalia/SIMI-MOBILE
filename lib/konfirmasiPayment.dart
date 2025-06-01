@@ -11,6 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'infoPekerjaan.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path/path.dart' as path;
 
 
@@ -244,51 +245,121 @@ class _konfirmasiPaymentPageState extends State<konfirmasiPayment> {
   
 
  Future<void> _submitPayment() async {
-    if (!_validateInputs()) return;
+  if (!_validateInputs()) return;
 
-    // Format waktu dengan benar
-    final transferTime = formatTimeOfDay24(_selectedTime!);
-    
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
-    );
+  // Format waktu dengan benar
+  final transferTime = formatTimeOfDay24(_selectedTime!);
+  
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
 
-    final result = await ApiService.submitPayment(
-      trainingRegistrationId: widget.trainingId,
-      invoiceCode: _kodeInvoiceController.text,
-      transferDate: _selectedDate!,
-      transferTime: transferTime,
-      proofOfTransfer: _buktiTransfer!,
-    );
+  final result = await ApiService.submitPayment(
+    trainingRegistrationId: widget.trainingId,
+    invoiceCode: _kodeInvoiceController.text,
+    transferDate: _selectedDate!,
+    transferTime: transferTime,
+    proofOfTransfer: _buktiTransfer!,
+  );
 
-    Navigator.of(context).pop(); // tutup loading dialog
+  Navigator.of(context).pop(); // tutup loading dialog
 
-    if (result['success'] == true) {
-      await PaymentStatusManager.setPaymentStatus(widget.trainingId, true);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'])),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const CustomNavBarPage()),
-        );
+  if (result['success'] == true) {
+    await PaymentStatusManager.setPaymentStatus(widget.trainingId, true);
+    if (mounted) {
+      // Tampilkan dialog sukses dengan animasi Lottie
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Lottie.asset(
+                      'assets/lottie/payment.json',
+                      repeat: false,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Berhasil melakukan pembayaran',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Harap menunggu konfirmasi admin',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Tutup dialog
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const CustomNavBarPage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink[100],
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text(
+                      'OK',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+  } else {
+    if (mounted) {
+      // Tampilkan detail error jika ada
+      String errorMessage = result['message'];
+      if (result['errors'] != null) {
+        errorMessage += '\n${result['errors'].toString()}';
       }
-    } else {
-      if (mounted) {
-        // Tampilkan detail error jika ada
-        String errorMessage = result['message'];
-        if (result['errors'] != null) {
-          errorMessage += '\n${result['errors'].toString()}';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     }
   }
+}
 
   bool _validateInputs() {
     if (_kodeInvoiceController.text.isEmpty) {

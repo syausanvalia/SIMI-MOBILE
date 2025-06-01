@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:simi/api_services.dart';
 import 'package:simi/training_cart_page.dart';
+import 'package:lottie/lottie.dart';
 
-// Format angka ke Rupiah
 String formatRupiah(dynamic number) {
   if (number == null) return 'Rp0';
   final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
@@ -37,7 +37,7 @@ class _DaftarKelasPageState extends State<DaftarKelasPage> {
   }
 
   Future<void> fetchAllTrainings() async {
-    final trainings = await ApiService.getTrainings(); // Ambil semua data pelatihan
+    final trainings = await ApiService.getTrainings();
     setState(() {
       allTrainings = trainings;
     });
@@ -55,6 +55,86 @@ class _DaftarKelasPageState extends State<DaftarKelasPage> {
         isLoading = false;
       });
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.asset(
+                  'assets/lottie/payment.json',
+                  width: 200,
+                  height: 200,
+                  repeat: false,
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Berhasil!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Berhasil menambahkan pemesanan anda ke keranjang',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TrainingCartPage(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink[100],
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'Lanjutkan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -131,15 +211,7 @@ class _DaftarKelasPageState extends State<DaftarKelasPage> {
                                   : () async {
                                       final result = await ApiService.postTrainingRegistration(training['id']);
                                       if (result['success']) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Berhasil mendaftar pelatihan!')),
-                                        );
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => TrainingCartPage(),
-                                          ),
-                                        );
+                                        _showSuccessDialog();
                                       } else {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(content: Text(result['message'] ?? 'Pendaftaran gagal')),

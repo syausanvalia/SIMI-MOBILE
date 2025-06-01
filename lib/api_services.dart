@@ -188,42 +188,42 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> getDashboard() async {
-    final token = await AuthMiddleware.getToken();
-    if (token == null || token.isEmpty) {
-      return {
-        'success': false,
-        'message': 'Token tidak ditemukan',
-      };
-    }
-
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/api/auth/dashboard'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200 && data['status'] == true) {
-        return {
-          'success': true,
-          'data': data['data'],
-        };
-      } else {
-        return {
-          'success': false,
-          'message': data['message'] ?? 'Gagal memuat dashboard',
-        };
-      }
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'Terjadi kesalahan: $e',
-      };
-    }
+  final token = await AuthMiddleware.getToken();
+  if (token == null || token.isEmpty) {
+    return {
+      'success': false,
+      'message': 'Token tidak ditemukan',
+    };
   }
+
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/auth/dashboard'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 && data['status'] == true) {
+      return {
+        'success': true,
+        'data': data['data'],
+      };
+    } else {
+      return {
+        'success': false,
+        'message': data['message'] ?? 'Gagal memuat dashboard',
+      };
+    }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Terjadi kesalahan: $e',
+    };
+  }
+}
 
   static Future<Map<String, dynamic>> sendOtp(String email) async {
     try {

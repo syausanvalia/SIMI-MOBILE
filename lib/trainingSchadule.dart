@@ -59,26 +59,32 @@ class _TrainingSchedulePageState extends State<TrainingSchedulePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Colors.pinkAccent),
                     onPressed: () {
                       Navigator.pop(context);
+                    },
+                  ),
+                  const Text(
+                    "Training Schedule",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.pinkAccent,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh, color: Colors.pinkAccent),
+                    onPressed: () {
+                      loadTrainingSchedule();
                     },
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              "Training Schedule",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.pinkAccent,
-              ),
-            ),
-            const SizedBox(height: 16),
 
             Expanded(
               child: RefreshIndicator(

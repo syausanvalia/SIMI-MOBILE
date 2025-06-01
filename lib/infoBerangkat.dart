@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart'; // Tambahkan import ini
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:simi/api_services.dart';
 import 'package:simi/berita.dart';
@@ -17,14 +18,27 @@ class InfoberangkatPage extends StatefulWidget {
   _InfoberangkatPageState createState() => _InfoberangkatPageState();
 }
 
-class _InfoberangkatPageState extends State<InfoberangkatPage> {
+class _InfoberangkatPageState extends State<InfoberangkatPage>
+    with SingleTickerProviderStateMixin {
   Map<String, dynamic>? travelInfo;
   bool isLoading = true;
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+    _scaleController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+    _scaleAnimation =
+        CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut);
     fetchTravelInfo();
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchTravelInfo() async {
@@ -33,6 +47,56 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
     });
 
     final logs = await ApiService.getTravelLogs();
+
+    if (logs.isEmpty) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        _scaleController.forward();
+        showDialog(
+          context: context,
+          builder: (_) => ScaleTransition(
+            scale: _scaleAnimation,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              contentPadding: EdgeInsets.all(24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Lottie.asset('assets/lottie/nodata.json',
+                      height: 180, repeat: false),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Belum ada data keberangkatan.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pinkAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Oke", style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      });
+    }
+
     setState(() {
       travelInfo = logs.isNotEmpty ? logs[0] : null;
       isLoading = false;
@@ -67,25 +131,38 @@ class _InfoberangkatPageState extends State<InfoberangkatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF9F6FB),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.pink),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Keberangkatan',
+          style: TextStyle(
+            color: Colors.pink,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.pink),
+            onPressed: fetchTravelInfo,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : travelInfo == null
-                ? const Center(child: Text("Tidak ada data berangkat."))
+                ? const SizedBox() // Tidak tampilkan apapun karena sudah pakai popup
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-                        child: Text(
-                          "Informasi Berangkat",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.pink,
-                          ),
-                        ),
-                      ),
                       Expanded(
                         child: RefreshIndicator(
                           onRefresh: fetchTravelInfo,
@@ -122,7 +199,8 @@ class CustomNavBarPage extends StatefulWidget {
 }
 
 class _CustomNavBarPageState extends State<CustomNavBarPage> {
-  final GlobalKey<CurvedNavigationBarState> navigationKey = GlobalKey<CurvedNavigationBarState>();
+  final GlobalKey<CurvedNavigationBarState> navigationKey =
+      GlobalKey<CurvedNavigationBarState>();
   late int _currentIndex;
 
   @override

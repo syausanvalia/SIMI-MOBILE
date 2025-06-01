@@ -87,8 +87,14 @@ flutter:
     - assets/lottie/success.json
     - assets/logoSimi.png
     - assets/lottie/walking.json
-
-
+    - assets/lottie/payment.json
+    - assets/lottie/transaction.json
+    - assets/lottie/forgot_password.json
+    - assets/lottie/data.json
+    - assets/lottie/classtidakbisadiakses.json
+    - assets/lottie/nodata.json
+    - assets/lottie/batalkelas.json
+    - assets/lottie/nilai.json
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

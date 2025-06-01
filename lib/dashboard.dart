@@ -13,6 +13,7 @@ import 'infoBerangkat.dart';
 import 'daftar_kelas_page.dart';
 import 'personaldata.dart';
 import 'package:simi/training_cart_page.dart';
+import 'package:lottie/lottie.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -30,6 +31,8 @@ class _DashboardState extends State<Dashboard> {
   String welcomeMessage = "";
   bool isLoading = true;
   bool hasError = false;
+  String? registrationStatus;
+   Map<String, dynamic>? userData;
 
   List<String> imageList = [
     'assets/fotodashboard.png',
@@ -71,13 +74,28 @@ class _DashboardState extends State<Dashboard> {
 
   Future<void> fetchDashboardData() async {
     try {
-      final data = await ApiService.getDashboard();
-      print("RESPON DASHBOARD: $data");
+      final response = await ApiService.getDashboard();
+      print("RESPON DASHBOARD: $response");
+      
       if (!mounted) return;
-      setState(() {
-        welcomeMessage = data['data']?['info'] ?? "Selamat datang pengguna";
-        isLoading = false;
-      });
+      
+      if (response['success']) {
+        final data = response['data'];
+        setState(() {
+          welcomeMessage = data['info'] ?? "Selamat datang pengguna";
+          registrationStatus = data['registration_status'];
+          userData = data['user'];
+          isLoading = false;
+        });
+        
+        print("Registration Status: $registrationStatus"); 
+      } else {
+        setState(() {
+          welcomeMessage = "Gagal memuat data";
+          hasError = true;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       print("ERROR DASHBOARD: $e");
       if (!mounted) return;
@@ -88,6 +106,78 @@ class _DashboardState extends State<Dashboard> {
       });
     }
   }
+ void _handleMenuNavigation(Widget page) {
+    print("Current Registration Status: $registrationStatus"); // Debug print
+    
+    if (registrationStatus == null || 
+        !(registrationStatus == 'active' || 
+          registrationStatus == 'completed')) {
+      _showRegistrationAlert(context);
+      return;
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+  }
+
+  void _showRegistrationAlert(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (ctx) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      child: Container(
+        padding: EdgeInsets.all(20),
+        constraints: BoxConstraints(maxHeight: 400),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ANIMASI LOTTIE
+            SizedBox(
+              height: 150,
+              child: Lottie.asset(
+                'assets/lottie/classtidakbisadiakses.json',
+                repeat: false,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Akses Ditolak!',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.redAccent,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Anda belum mendaftar kelas, silakan daftar kelas terlebih dahulu.',
+              style: TextStyle(fontSize: 14, color: Colors.black87),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.pinkAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: Icon(Icons.arrow_forward),
+              label: Text('Daftar Kelas'),
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => DaftarKelasPage()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -147,8 +237,7 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: isLoading
@@ -173,33 +262,22 @@ class _DashboardState extends State<Dashboard> {
                 shrinkWrap: true,
                 children: [
                   _buildMenuItem(Icons.account_box, "Data Pribadi", () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => PersonalDataScreen()));
+                    _handleMenuNavigation(PersonalDataScreen());
                   }),
-                  _buildMenuItem(Icons.assignment_turned_in, "Kelengkapan Data",
-                      () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => CompletaData()));
+                  _buildMenuItem(Icons.assignment_turned_in, "Kelengkapan Data", () {
+                    _handleMenuNavigation(CompletaData());
                   }),
                   _buildMenuItem(Icons.flight_takeoff, "Keberangkatan", () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => InfoberangkatPage()));
+                    _handleMenuNavigation(InfoberangkatPage());
                   }),
                   _buildMenuItem(Icons.school, "Kelulusan", () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => GraduationPage()));
+                    _handleMenuNavigation(GraduationPage());
                   }),
                   _buildMenuItem(Icons.schedule_sharp, "Jadwal Pelatihan", () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => TrainingSchedulePage()));
+                    _handleMenuNavigation(TrainingSchedulePage());
                   }),
                   _buildMenuItem(Icons.grade, "Hasil Nilai", () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => FinalScorePage()));
+                    _handleMenuNavigation(FinalScorePage());
                   }),
                   _buildMenuItem(Icons.class_, "Kelas Pelatihan", () {
                     Navigator.push(context,
@@ -214,21 +292,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildMenuItem(dynamic icon, String label, VoidCallback onTap) {
-    Widget iconWidget;
-
-    if (icon is IconData) {
-      iconWidget = Icon(icon, size: 28, color: Colors.grey[800]);
-    } else if (icon is String) {
-      iconWidget = Image.asset(
-        icon,
-        width: 28,
-        height: 28,
-      );
-    } else {
-      iconWidget = Icon(Icons.help_outline, size: 28);
-    }
-
+  Widget _buildMenuItem(IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -242,7 +306,7 @@ class _DashboardState extends State<Dashboard> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            iconWidget,
+            Icon(icon, size: 28, color: Colors.grey[800]),
             SizedBox(height: 10),
             Text(
               label,
@@ -278,9 +342,7 @@ class _DashboardState extends State<Dashboard> {
           TextButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-
               final success = await ApiService.logout();
-
               if (success) {
                 Navigator.pushAndRemoveUntil(
                   context,

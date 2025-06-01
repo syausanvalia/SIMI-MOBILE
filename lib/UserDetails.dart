@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'custom_navbar.dart';
 import 'api_services.dart';
 
@@ -39,16 +40,9 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.green.shade50,
-                  ),
-                  child: Icon(
-                    Icons.check_circle,
-                    color: Colors.green,
-                    size: 50,
-                  ),
+                  height: 120,
+                  width: 120,
+                  child: Lottie.asset('assets/lottie/data.json'),
                 ),
                 SizedBox(height: 20),
                 Text(

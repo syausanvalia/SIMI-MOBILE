@@ -1,12 +1,12 @@
-// resetpass.dart
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'login.dart';
 import 'success.dart';
 import 'api_services.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: ResetPasswordPage(email: '', otp: ''), // Berikan nilai default untuk testing
+    home: ResetPasswordPage(email: '', otp: ''),
     debugShowCheckedModeBanner: false,
   ));
 }
@@ -15,11 +15,10 @@ class ResetPasswordPage extends StatefulWidget {
   final String email;
   final String otp;
 
-  // Tambahkan konstruktor dengan required parameters
   const ResetPasswordPage({
-    Key? key, 
-    required this.email, 
-    required this.otp
+    Key? key,
+    required this.email,
+    required this.otp,
   }) : super(key: key);
 
   @override
@@ -30,9 +29,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool passwordVisible = false;
   bool repeatPasswordVisible = false;
   bool isLoading = false;
-  
+
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController repeatPasswordController = TextEditingController();
+  final TextEditingController repeatPasswordController =
+      TextEditingController();
 
   Future<void> _handleResetPassword() async {
     final password = passwordController.text;
@@ -70,11 +70,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       );
 
       if (result['success']) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => SuccessPage()),
-          (route) => false,
-        );
+        _showSuccessDialog(); // Show Lottie dialog
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result['message'])),
@@ -87,6 +83,67 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     } finally {
       setState(() => isLoading = false);
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.asset(
+                  'assets/lottie/forgot_password.json',
+                  width: 150,
+                  height: 150,
+                  repeat: false,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Password berhasil diubah!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      (route) => false,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink.shade100,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  ),
+                  child: Text(
+                    'Ke Halaman Login',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -161,7 +218,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.black),
                             ),
                           )
                         : const Text(

@@ -13,9 +13,7 @@ class _CompletaDataState extends State<CompletaData> {
   Map<String, dynamic>? userData;
   bool isLoading = true;
 
-  // Peta nama label ke nama field di backend
   final Map<String, String> fieldKeyMap = {
-    // Personal Data
     "No KTP": "id_card_number",
     "No KK": "family_card_number",
     "No Paspor": "passport_number",

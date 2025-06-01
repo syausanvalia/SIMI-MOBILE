@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:simi/api_services.dart';
 import 'package:simi/payment_status_manager.dart';
-import 'payment.dart'; // Pastikan file ini ada
+import 'package:lottie/lottie.dart';
+import 'payment.dart';
 
 class TrainingCartPage extends StatefulWidget {
   @override
@@ -62,9 +63,8 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
         setState(() {
           registrations.removeWhere((item) => item['id'] == id);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registrasi berhasil dibatalkan')),
-        );
+
+        _showCancelSuccessDialog(); // ganti SnackBar dengan pop up animasi
       } else {
         throw Exception(response['message'] ?? 'Gagal membatalkan registrasi');
       }
@@ -74,6 +74,133 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
         SnackBar(content: Text('Terjadi kesalahan saat membatalkan registrasi')),
       );
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Lottie.asset(
+                    'assets/lottie/transaction.json',
+                    repeat: false,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Pembayaran Anda Berhasil',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Kelas Anda Sudah Aktif',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.green,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink[100],
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(
+                    'OK',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCancelSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset(
+                'assets/lottie/batalkelas.json',
+                width: 180,
+                height: 180,
+                repeat: false,
+              ),
+              SizedBox(height: 16),
+              Text(
+                "Registrasi Berhasil Dibatalkan",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Anda telah membatalkan pelatihan ini.",
+                style: TextStyle(fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Tutup", style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildCartItem(Map<String, dynamic> item) {
@@ -88,6 +215,12 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
       builder: (context, snapshot) {
         final isPaid = snapshot.data ?? false;
         final isActive = status == 'active';
+
+        if (isActive) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showSuccessDialog();
+          });
+        }
 
         return Container(
           margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -116,7 +249,7 @@ class _TrainingCartPageState extends State<TrainingCartPage> {
                 "Status: ${isPaid ? 'Menunggu Konfirmasi Admin' : item['status']}",
                 style: TextStyle(
                   fontSize: 14,
-                  color: isPaid ? Colors.white : Colors.grey[700],
+                  color: isPaid ? Colors.black : Colors.grey[700],
                 ),
               ),
               SizedBox(height: 12),

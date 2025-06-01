@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:simi/dashboard.dart';
 import 'dart:async';
-import 'api_services.dart'; // Ganti path sesuai struktur proyek kamu
+import 'api_services.dart';
 
 class GraduationPage extends StatefulWidget {
   const GraduationPage({super.key});
@@ -48,6 +50,12 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
       final data = await ApiService.fetchExamScores();
       final approvedData = data.where((e) => e['review_status'] == 'approved').toList();
 
+      if (approvedData.isEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showNoDataDialog();
+        });
+      }
+
       setState(() {
         examScores = approvedData;
         isLoading = false;
@@ -55,9 +63,10 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
           showCongrats = true;
           _controller.forward();
 
-          Future.delayed(const Duration(seconds: 4), () {
-            Navigator.pushReplacementNamed(context, '/complete-data');
-          });
+          Future.delayed(const Duration(seconds: 10), () {
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        });
+
         }
       });
     } catch (e) {
@@ -66,6 +75,55 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
         isLoading = false;
       });
     }
+  }
+
+  void _showNoDataDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.asset(
+                  'assets/lottie/data.json',
+                  width: 200,
+                  height: 200,
+                  repeat: false,
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Belum ada data nilai ujian yang disetujui.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pinkAccent,
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  ),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget buildScoreCard(Map<String, dynamic> score, int index) {
@@ -130,9 +188,7 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
             ),
           ),
           const Text(": "),
-          Expanded(
-            child: Text(value),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );
@@ -185,7 +241,7 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          "Graduation",
+          "Kelulusan",
           style: TextStyle(color: Colors.pinkAccent),
         ),
         backgroundColor: Colors.white,
@@ -201,7 +257,7 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.pinkAccent),
             onPressed: () {
-              loadExamScores(); // <-- Fitur refresh
+              loadExamScores(); // refresh
             },
           )
         ],
@@ -212,14 +268,12 @@ class _GraduationPageState extends State<GraduationPage> with SingleTickerProvid
               children: [
                 buildCongratsBanner(),
                 Expanded(
-                  child: examScores.isEmpty
-                      ? const Center(child: Text("Belum ada data nilai ujian yang disetujui."))
-                      : ListView.builder(
-                          itemCount: examScores.length,
-                          itemBuilder: (context, index) {
-                            return buildScoreCard(examScores[index], index);
-                          },
-                        ),
+                  child: ListView.builder(
+                    itemCount: examScores.length,
+                    itemBuilder: (context, index) {
+                      return buildScoreCard(examScores[index], index);
+                    },
+                  ),
                 ),
               ],
             ),
